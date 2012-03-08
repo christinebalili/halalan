@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,10 +20,10 @@
 
 class Parties extends CI_Controller {
 
-	var $admin;
-	var $settings;
+	public $admin;
+	public $settings;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->admin = $this->session->userdata('admin');
@@ -35,7 +35,7 @@ class Parties extends CI_Controller {
 		$this->settings = $this->config->item('halalan');
 	}
 	
-	function index($election_id = 0)
+	public function index($election_id = 0)
 	{
 		$this->load->helper('cookie');
 		$elections = $this->Election->select_all_with_positions();
@@ -63,17 +63,17 @@ class Parties extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function add()
+	public function add()
 	{
 		$this->_party('add');
 	}
 
-	function edit($id)
+	public function edit($id)
 	{
 		$this->_party('edit', $id);
 	}
 
-	function delete($id) 
+	public function delete($id) 
 	{
 		if ( ! $id)
 		{
@@ -100,7 +100,7 @@ class Parties extends CI_Controller {
 		redirect('admin/parties');
 	}
 
-	function _party($case, $id = null)
+	public function _party($case, $id = null)
 	{
 		$chosen = array();
 		if ($case == 'add')
@@ -188,7 +188,7 @@ class Parties extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function _rule_party_exists()
+	public function _rule_party_exists()
 	{
 		$party = trim($this->input->post('party', TRUE));
 		if ($test = $this->Party->select_by_party($party))
@@ -219,7 +219,7 @@ class Parties extends CI_Controller {
 	}
 
 	// placed in position so it comes up on top
-	function _rule_dependencies()
+	public function _rule_dependencies()
 	{
 		if ($party = $this->session->userdata('party')) // edit
 		{
@@ -245,7 +245,7 @@ class Parties extends CI_Controller {
 		return TRUE;
 	}
 
-	function _rule_running_election()
+	public function _rule_running_election()
 	{
 		if ($this->Election->is_running($this->input->post('chosen')))
 		{
@@ -258,7 +258,7 @@ class Parties extends CI_Controller {
 		}
 	}
 
-	function _rule_logo()
+	public function _rule_logo()
 	{
 		if ($_FILES['logo']['error'] != UPLOAD_ERR_NO_FILE)
 		{
@@ -299,7 +299,7 @@ class Parties extends CI_Controller {
 		}
 	}
 
-	function _resize($upload_data, $n)
+	public function _resize($upload_data, $n)
 	{
 		$width = $upload_data['image_width'];
 		$height = $upload_data['image_height'];
@@ -336,4 +336,4 @@ class Parties extends CI_Controller {
 }
 
 /* End of file parties.php */
-/* Location: ./system/application/controllers/admin/parties.php */
+/* Location: ./application/controllers/admin/parties.php */

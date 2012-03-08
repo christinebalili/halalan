@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,12 +20,12 @@
 
 class Block_Election_Position extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function select_all_by_block_id($block_id)
+	public function select_all_by_block_id($block_id)
 	{
 		$this->db->from('blocks_elections_positions');
 		$this->db->where(compact('block_id'));
@@ -36,4 +36,4 @@ class Block_Election_Position extends CI_Model {
 }
 
 /* End of file block_election_position.php */
-/* Location: ./system/application/models/block_election_position.php */
+/* Location: ./application/models/block_election_position.php */

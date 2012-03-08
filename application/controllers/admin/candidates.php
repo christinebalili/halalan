@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,10 +20,10 @@
 
 class Candidates extends CI_Controller {
 
-	var $admin;
-	var $settings;
+	public $admin;
+	public $settings;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->admin = $this->session->userdata('admin');
@@ -35,7 +35,7 @@ class Candidates extends CI_Controller {
 		$this->settings = $this->config->item('halalan');
 	}
 	
-	function index($election_id = 0, $position_id = 0)
+	public function index($election_id = 0, $position_id = 0)
 	{
 		$this->load->helper('cookie');
 		$elections = $this->Election->select_all_with_positions();
@@ -85,7 +85,7 @@ class Candidates extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function add()
+	public function add()
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
@@ -100,7 +100,7 @@ class Candidates extends CI_Controller {
 		}
 	}
 
-	function edit($id)
+	public function edit($id)
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
@@ -115,7 +115,7 @@ class Candidates extends CI_Controller {
 		}
 	}
 
-	function delete($id) 
+	public function delete($id) 
 	{
 		if ( ! $id)
 		{
@@ -142,7 +142,7 @@ class Candidates extends CI_Controller {
 		redirect('admin/candidates');
 	}
 
-	function _candidate($case, $id = null)
+	public function _candidate($case, $id = null)
 	{
 		$election_id = 0;
 		if ($case == 'add')
@@ -226,7 +226,7 @@ class Candidates extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function _rule_candidate_exists()
+	public function _rule_candidate_exists()
 	{
 		$first_name = trim($this->input->post('first_name', TRUE));
 		$last_name = trim($this->input->post('last_name', TRUE));
@@ -261,7 +261,7 @@ class Candidates extends CI_Controller {
 	}
 
 	// placed in first name so it comes up on top
-	function _rule_dependencies()
+	public function _rule_dependencies()
 	{
 		if ($candidate = $this->session->userdata('candidate')) // edit
 		{
@@ -282,7 +282,7 @@ class Candidates extends CI_Controller {
 		return TRUE;
 	}
 
-	function _rule_running_election()
+	public function _rule_running_election()
 	{
 		if ($this->Election->is_running(array($this->input->post('election_id'))))
 		{
@@ -295,7 +295,7 @@ class Candidates extends CI_Controller {
 		}
 	}
 
-	function _rule_picture()
+	public function _rule_picture()
 	{
 		if ($_FILES['picture']['error'] != UPLOAD_ERR_NO_FILE)
 		{
@@ -336,7 +336,7 @@ class Candidates extends CI_Controller {
 		}
 	}
 
-	function _resize($upload_data, $n)
+	public function _resize($upload_data, $n)
 	{
 		$width = $upload_data['image_width'];
 		$height = $upload_data['image_height'];
@@ -373,4 +373,4 @@ class Candidates extends CI_Controller {
 }
 
 /* End of file candidates.php */
-/* Location: ./system/application/controllers/admin/candidates.php */
+/* Location: ./application/controllers/admin/candidates.php */

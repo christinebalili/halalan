@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,7 +20,7 @@
 
 class Gate extends CI_Controller {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		if ( ! in_array($this->uri->segment(2), array('results', 'statistics', 'ballots', 'logout')))
@@ -37,12 +37,12 @@ class Gate extends CI_Controller {
 		
 	}
 
-	function index()
+	public function index()
 	{
 		redirect('gate/voter');
 	}
 
-	function voter()
+	public function voter()
 	{
 		$this->_no_cache();
 		$data['settings'] = $this->config->item('halalan');
@@ -52,7 +52,7 @@ class Gate extends CI_Controller {
 		$this->load->view('gate', $gate);
 	}
 
-	function voter_login()
+	public function voter_login()
 	{
 		if ( ! $this->input->post('username') || ! $this->input->post('password'))
 		{
@@ -91,7 +91,7 @@ class Gate extends CI_Controller {
 		}
 	}
 	
-	function admin()
+	public function admin()
 	{
 		$gate['login'] = 'admin';
 		$gate['title'] = e('gate_admin_title');
@@ -99,7 +99,7 @@ class Gate extends CI_Controller {
 		$this->load->view('gate', $gate);
 	}
 
-	function admin_login()
+	public function admin_login()
 	{
 		if ( ! $this->input->post('username') || ! $this->input->post('password'))
 		{
@@ -128,7 +128,7 @@ class Gate extends CI_Controller {
 		}
 	}
 
-	function logout()
+	public function logout()
 	{
 		if ($this->session->userdata('admin'))
 		{
@@ -151,7 +151,7 @@ class Gate extends CI_Controller {
 		redirect('gate/' . $gate);
 	}
 
-	function results()
+	public function results()
 	{
 		$selected = $this->input->post('elections', TRUE);
 		$all_elections = $this->Election->select_all_with_results();
@@ -192,7 +192,7 @@ class Gate extends CI_Controller {
 		$this->load->view('gate', $gate);
 	}
 
-	function statistics()
+	public function statistics()
 	{
 		$this->load->model('Statistics');
 		$selected = $this->input->post('elections', TRUE);
@@ -228,7 +228,7 @@ class Gate extends CI_Controller {
 		$this->load->view('gate', $gate);
 	}
 
-	function ballots($block_id = 0)
+	public function ballots($block_id = 0)
 	{
 		$array = array();
 		$elections = array();
@@ -271,7 +271,7 @@ class Gate extends CI_Controller {
 		$this->load->view('gate', $gate);
 	}
 
-	function _no_cache()
+	public function _no_cache()
 	{
 		// from http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers
 		header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
@@ -282,4 +282,4 @@ class Gate extends CI_Controller {
 }
 
 /* End of file gate.php */
-/* Location: ./system/application/controllers/gate.php */
+/* Location: ./application/controllers/gate.php */

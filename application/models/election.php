@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,28 +20,28 @@
 
 class Election extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function insert($election)
+	public function insert($election)
 	{
 		return $this->db->insert('elections', $election);
 	}
 
-	function update($election, $id)
+	public function update($election, $id)
 	{
 		return $this->db->update('elections', $election, compact('id'));
 	}
 
-	function delete($id)
+	public function delete($id)
 	{
 		$this->db->where(compact('id'));
 		return $this->db->delete('elections');
 	}
 
-	function select($id)
+	public function select($id)
 	{
 		$this->db->from('elections');
 		$this->db->where(compact('id'));
@@ -49,14 +49,14 @@ class Election extends CI_Model {
 		return $query->row_array();
 	}
 
-	function select_all()
+	public function select_all()
 	{
 		$this->db->from('elections');
 		$query = $this->db->get();
 		return $query->result_array();
 	}
 
-	function select_all_by_ids($ids)
+	public function select_all_by_ids($ids)
 	{
 		$this->db->from('elections');
 		$this->db->where_in('id', $ids);
@@ -64,7 +64,7 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_all_by_level()
+	public function select_all_by_level()
 	{
 		$this->db->from('elections');
 		$this->db->where('parent_id', '0');
@@ -84,7 +84,7 @@ class Election extends CI_Model {
 		return $return;
 	}
 
-	function select_all_children_by_parent_id($id)
+	public function select_all_children_by_parent_id($id)
 	{
 		$this->db->from('elections');
 		$this->db->where('parent_id', $id);
@@ -92,7 +92,7 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_all_parents()
+	public function select_all_parents()
 	{
 		$this->db->from('elections');
 		$this->db->where('parent_id', '0');
@@ -101,7 +101,7 @@ class Election extends CI_Model {
 	}
 
 	// all elections that have positions assigned to them
-	function select_all_with_positions()
+	public function select_all_with_positions()
 	{
 		$this->db->from('elections');
 		$this->db->where('id IN (SELECT DISTINCT election_id FROM elections_positions)');
@@ -110,7 +110,7 @@ class Election extends CI_Model {
 	}
 
 	// elections with results should not be running
-	function select_all_with_results()
+	public function select_all_with_results()
 	{
 		$this->db->from('elections');
 		$this->db->where('results', TRUE);
@@ -119,14 +119,14 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	function in_use($election_id)
+	public function in_use($election_id)
 	{
 		$this->db->from('elections_positions');
 		$this->db->where(compact('election_id'));
 		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
 	}
 
-	function is_running($ids)
+	public function is_running($ids)
 	{
 		$this->db->from('elections');
 		$this->db->where('status', TRUE);
@@ -137,4 +137,4 @@ class Election extends CI_Model {
 }
 
 /* End of file election.php */
-/* Location: ./system/application/models/election.php */
+/* Location: ./application/models/election.php */

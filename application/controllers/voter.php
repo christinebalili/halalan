@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,10 +20,10 @@
 
 class Voter extends CI_Controller {
 
-	var $voter;
-	var $settings;
+	public $voter;
+	public $settings;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->voter = $this->session->userdata('voter');
@@ -36,7 +36,7 @@ class Voter extends CI_Controller {
 		$this->settings = $this->config->item('halalan');
 	}
 
-	function index()
+	public function index()
 	{
 		$this->_no_cache();
 		$election_ids = array();
@@ -61,7 +61,7 @@ class Voter extends CI_Controller {
 		$this->load->view('voter', $voter);
 	}
 
-	function vote()
+	public function vote()
 	{
 		$this->_no_cache();
 		$rules = array('position_count' => 0, 'candidate_count' => array()); // used in checking in do_vote
@@ -109,7 +109,7 @@ class Voter extends CI_Controller {
 		$this->load->view('voter', $voter);
 	}
 
-	function do_vote()
+	public function do_vote()
 	{
 		$error = array();
 		$votes = $this->input->post('votes');
@@ -167,7 +167,7 @@ class Voter extends CI_Controller {
 		}
 	}
 
-	function verify()
+	public function verify()
 	{
 		$this->_no_cache();
 		$votes = $this->session->userdata('votes');
@@ -218,7 +218,7 @@ class Voter extends CI_Controller {
 		$this->load->view('voter', $voter);
 	}
 
-	function do_verify()
+	public function do_verify()
 	{
 		$error = array();
 		if ($this->settings['captcha'])
@@ -290,7 +290,7 @@ class Voter extends CI_Controller {
 		}
 	}
 
-	function logout()
+	public function logout()
 	{
 		$this->_no_cache();
 		$this->Boter->update(array('logout' => date('Y-m-d H:i:s')), $this->voter['id']);
@@ -303,7 +303,7 @@ class Voter extends CI_Controller {
 		$this->load->view('voter', $voter);
 	}
 
-	function votes($case, $election_id = 0)
+	public function votes($case, $election_id = 0)
 	{
 		$this->_no_cache();
 		// if url is not votes/view or votes/print
@@ -418,7 +418,7 @@ class Voter extends CI_Controller {
 	}
 
 	// some code taken from CI's captcha plugin
-	function _generate_image_trail($votes)
+	public function _generate_image_trail($votes)
 	{
 		$font = './public/fonts/Vera.ttf';
 		foreach ($votes as $election_id => $positions)
@@ -561,7 +561,7 @@ class Voter extends CI_Controller {
 	}
 
 	// get only running elections
-	function _filter($elections)
+	public function _filter($elections)
 	{
 		$parents = array();
 		$children = array();
@@ -626,7 +626,7 @@ class Voter extends CI_Controller {
 		return $tmp;
 	}
 
-	function _no_cache()
+	public function _no_cache()
 	{
 		// from http://stackoverflow.com/questions/49547/making-sure-a-web-page-is-not-cached-across-all-browsers
 		header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
@@ -637,4 +637,4 @@ class Voter extends CI_Controller {
 }
 
 /* End of file voter.php */
-/* Location: ./system/application/controllers/voter.php */
+/* Location: ./application/controllers/voter.php */

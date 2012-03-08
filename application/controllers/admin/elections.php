@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,10 +20,10 @@
 
 class Elections extends CI_Controller {
 
-	var $admin;
-	var $settings;
+	public $admin;
+	public $settings;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->admin = $this->session->userdata('admin');
@@ -35,7 +35,7 @@ class Elections extends CI_Controller {
 		$this->settings = $this->config->item('halalan');
 	}
 	
-	function index()
+	public function index()
 	{
 		$data['elections'] = $this->Election->select_all_by_level();
 		$admin['username'] = $this->admin['username'];
@@ -44,17 +44,17 @@ class Elections extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function add()
+	public function add()
 	{
 		$this->_election('add');
 	}
 
-	function edit($id)
+	public function edit($id)
 	{
 		$this->_election('edit', $id);
 	}
 
-	function delete($id) 
+	public function delete($id) 
 	{
 		if ( ! $id)
 		{
@@ -81,7 +81,7 @@ class Elections extends CI_Controller {
 		redirect('admin/elections');
 	}
 
-	function options($case, $id)
+	public function options($case, $id)
 	{
 		if ($case == 'status' || $case == 'results')
 		{
@@ -112,7 +112,7 @@ class Elections extends CI_Controller {
 		redirect('admin/elections');
 	}
 
-	function _election($case, $id = null)
+	public function _election($case, $id = null)
 	{
 		if ($case == 'add')
 		{
@@ -165,4 +165,4 @@ class Elections extends CI_Controller {
 }
 
 /* End of file elections.php */
-/* Location: ./system/application/controllers/admin/elections.php */
+/* Location: ./application/controllers/admin/elections.php */

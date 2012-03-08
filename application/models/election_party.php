@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,12 +20,12 @@
 
 class Election_Party extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function select_all_by_party_id($party_id)
+	public function select_all_by_party_id($party_id)
 	{
 		$this->db->from('elections_parties');
 		$this->db->where(compact('party_id'));
@@ -35,4 +35,5 @@ class Election_Party extends CI_Model {
 
 }
 
-?>
+/* End of file election_party.php */
+/* Location: ./application/models/election_party.php */

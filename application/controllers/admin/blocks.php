@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,10 +20,10 @@
 
 class Blocks extends CI_Controller {
 
-	var $admin;
-	var $settings;
+	public $admin;
+	public $settings;
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		$this->admin = $this->session->userdata('admin');
@@ -35,7 +35,7 @@ class Blocks extends CI_Controller {
 		$this->settings = $this->config->item('halalan');
 	}
 	
-	function index($election_id = 0)
+	public function index($election_id = 0)
 	{
 		$this->load->helper('cookie');
 		$elections = $this->Election->select_all_with_positions();
@@ -63,7 +63,7 @@ class Blocks extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function add()
+	public function add()
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
@@ -76,7 +76,7 @@ class Blocks extends CI_Controller {
 		}
 	}
 
-	function edit($id)
+	public function edit($id)
 	{
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
 		{
@@ -89,7 +89,7 @@ class Blocks extends CI_Controller {
 		}
 	}
 
-	function delete($id) 
+	public function delete($id) 
 	{
 		if ( ! $id)
 		{
@@ -116,7 +116,7 @@ class Blocks extends CI_Controller {
 		redirect('admin/blocks');
 	}
 
-	function _block($case, $id = null)
+	public function _block($case, $id = null)
 	{
 		$chosen_elections = array();
 		$chosen_positions = array();
@@ -234,7 +234,7 @@ class Blocks extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
-	function _fill_positions($election_ids, $json)
+	public function _fill_positions($election_ids, $json)
 	{
 		$general = array();
 		$specific = array();
@@ -269,4 +269,4 @@ class Blocks extends CI_Controller {
 }
 
 /* End of file blocks.php */
-/* Location: ./system/application/controllers/admin/blocks.php */
+/* Location: ./application/controllers/admin/blocks.php */

@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,12 +20,12 @@
 
 class Abmin extends CI_Model {
 	
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function authenticate($username, $password)
+	public function authenticate($username, $password)
 	{
 		$this->db->from('admins');
 		$this->db->where(compact('username', 'password'));
@@ -33,7 +33,7 @@ class Abmin extends CI_Model {
 		return $query->row_array();
 	}
 
-	function select($id)
+	public function select($id)
 	{
 		$this->db->from('admins');
 		$this->db->where(compact('id'));
@@ -44,4 +44,4 @@ class Abmin extends CI_Model {
 }
 
 /* End of file abmin.php */
-/* Location: ./system/application/models/abmin.php */
+/* Location: ./application/models/abmin.php */

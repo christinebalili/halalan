@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,12 +20,12 @@
 
 class Party extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function insert($party)
+	public function insert($party)
 	{
 		$chosen = $party['chosen'];
 		unset($party['chosen']);
@@ -41,7 +41,7 @@ class Party extends CI_Model {
 		return TRUE;
 	}
 
-	function update($party, $id)
+	public function update($party, $id)
 	{
 		$chosen = $party['chosen'];
 		unset($party['chosen']);
@@ -59,7 +59,7 @@ class Party extends CI_Model {
 		return TRUE;
 	}
 
-	function delete($id)
+	public function delete($id)
 	{
 		$this->db->where('party_id', $id);
 		$this->db->delete('elections_parties');
@@ -67,7 +67,7 @@ class Party extends CI_Model {
 		return $this->db->delete('parties');
 	}
 
-	function select($id)
+	public function select($id)
 	{
 		$this->db->from('parties');
 		$this->db->where(compact('id'));
@@ -75,14 +75,14 @@ class Party extends CI_Model {
 		return $query->row_array();
 	}
 
-	function select_all()
+	public function select_all()
 	{
 		$this->db->from('parties');
 		$query = $this->db->get();
 		return $query->result_array();
 	}
 
-	function select_all_by_election_id($election_id)
+	public function select_all_by_election_id($election_id)
 	{
 		$this->db->from('parties');
 		$this->db->join('elections_parties', 'parties.id = elections_parties.party_id');
@@ -92,7 +92,7 @@ class Party extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_by_party($party)
+	public function select_by_party($party)
 	{
 		$this->db->from('parties');
 		$this->db->where(compact('party'));
@@ -100,14 +100,14 @@ class Party extends CI_Model {
 		return $query->row_array();
 	}
 
-	function in_use($party_id)
+	public function in_use($party_id)
 	{
 		$this->db->from('candidates');
 		$this->db->where(compact('party_id'));
 		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
 	}
 
-	function in_running_election($party_id)
+	public function in_running_election($party_id)
 	{
 		$this->db->from('candidates');
 		$this->db->where(compact('party_id'));
@@ -118,4 +118,4 @@ class Party extends CI_Model {
 }
 
 /* End of file party.php */
-/* Location: ./system/application/models/party.php */
+/* Location: ./application/models/party.php */

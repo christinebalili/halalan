@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,12 +20,12 @@
 
 class Position extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function insert($position)
+	public function insert($position)
 	{
 		$chosen = $position['chosen'];
 		unset($position['chosen']);
@@ -41,7 +41,7 @@ class Position extends CI_Model {
 		return TRUE;
 	}
 
-	function update($position, $id)
+	public function update($position, $id)
 	{
 		$chosen = $position['chosen'];
 		unset($position['chosen']);
@@ -59,7 +59,7 @@ class Position extends CI_Model {
 		return TRUE;
 	}
 
-	function delete($id)
+	public function delete($id)
 	{
 		$this->db->where('position_id', $id);
 		$this->db->delete('elections_positions');
@@ -69,7 +69,7 @@ class Position extends CI_Model {
 		return $this->db->delete('positions');
 	}
 
-	function select($id)
+	public function select($id)
 	{
 		$this->db->from('positions');
 		$this->db->where(compact('id'));
@@ -77,7 +77,7 @@ class Position extends CI_Model {
 		return $query->row_array();
 	}
 
-	function select_all()
+	public function select_all()
 	{
 		$this->db->from('positions');
 		$this->db->order_by('ordinality', 'ASC');
@@ -85,7 +85,7 @@ class Position extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_all_by_ids($ids)
+	public function select_all_by_ids($ids)
 	{
 		$this->db->from('positions');
 		$this->db->where_in('id', $ids);
@@ -94,7 +94,7 @@ class Position extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_all_by_election_id($election_id)
+	public function select_all_by_election_id($election_id)
 	{
 		$this->db->from('positions');
 		$this->db->join('elections_positions', 'positions.id = elections_positions.position_id');
@@ -104,7 +104,7 @@ class Position extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_by_position($position)
+	public function select_by_position($position)
 	{
 		$this->db->from('positions');
 		$this->db->where(compact('position'));
@@ -112,7 +112,7 @@ class Position extends CI_Model {
 		return $query->row_array();
 	}
 
-	function in_use($position_id)
+	public function in_use($position_id)
 	{
 		$this->db->from('candidates');
 		$this->db->where(compact('position_id'));
@@ -123,7 +123,7 @@ class Position extends CI_Model {
 		return $has_candidates || $has_blocks ? TRUE : FALSE;
 	}
 
-	function in_running_election($position_id)
+	public function in_running_election($position_id)
 	{
 		$this->db->from('elections_positions');
 		$this->db->where(compact('position_id'));
@@ -134,4 +134,4 @@ class Position extends CI_Model {
 }
 
 /* End of file position.php */
-/* Location: ./system/application/models/position.php */
+/* Location: ./application/models/position.php */

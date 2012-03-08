@@ -1,6 +1,6 @@
-<?php
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
- * Copyright (C) 2006-2011  University of the Philippines Linux Users' Group
+ * Copyright (C) 2006-2012 University of the Philippines Linux Users' Group
  *
  * This file is part of Halalan.
  *
@@ -20,28 +20,28 @@
 
 class Candidate extends CI_Model {
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	function insert($candidate)
+	public function insert($candidate)
 	{
 		return $this->db->insert('candidates', $candidate);
 	}
 
-	function update($candidate, $id)
+	public function update($candidate, $id)
 	{
 		return $this->db->update('candidates', $candidate, compact('id'));
 	}
 
-	function delete($id)
+	public function delete($id)
 	{
 		$this->db->where(compact('id'));
 		return $this->db->delete('candidates');
 	}
 
-	function select($id)
+	public function select($id)
 	{
 		$this->db->where(compact('id'));
 		$this->db->from('candidates');
@@ -49,7 +49,7 @@ class Candidate extends CI_Model {
 		return $query->row_array();
 	}
 
-	function select_all_by_election_id_and_position_id($election_id, $position_id)
+	public function select_all_by_election_id_and_position_id($election_id, $position_id)
 	{
 		$this->db->from('candidates');
 		$this->db->where(compact('election_id', 'position_id'));
@@ -58,7 +58,7 @@ class Candidate extends CI_Model {
 		return $query->result_array();
 	}
 
-	function select_by_name_and_alias($first_name, $last_name, $alias)
+	public function select_by_name_and_alias($first_name, $last_name, $alias)
 	{
 		$this->db->from('candidates');
 		if (empty($alias))
@@ -73,14 +73,14 @@ class Candidate extends CI_Model {
 		return $query->row_array();
 	}
 
-	function in_use($candidate_id)
+	public function in_use($candidate_id)
 	{
 		$this->db->from('votes');
 		$this->db->where(compact('candidate_id'));
 		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
 	}
 
-	function in_running_election($candidate_id)
+	public function in_running_election($candidate_id)
 	{
 		$this->db->from('candidates');
 		$this->db->where('id', $candidate_id);
@@ -91,4 +91,4 @@ class Candidate extends CI_Model {
 }
 
 /* End of file candidate.php */
-/* Location: ./system/application/models/candidate.php */
+/* Location: ./application/models/candidate.php */
