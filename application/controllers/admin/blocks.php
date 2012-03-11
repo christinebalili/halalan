@@ -37,16 +37,15 @@ class Blocks extends CI_Controller {
 	
 	public function index($election_id = 0)
 	{
-		$this->load->helper('cookie');
 		$elections = $this->Election->select_all_with_positions();
 		// If only one election exists, show it by default.
 		if (count($elections) == 1)
 		{
 			$election_id = $elections[0]['id'];
 		}
-		else if (get_cookie('selected_election'))
+		else if ($this->input->cookie('selected_election'))
 		{
-			$election_id = get_cookie('selected_election');
+			$election_id = $this->input->cookie('selected_election');
 		}
 		$tmp = array();
 		foreach ($elections as $election)
