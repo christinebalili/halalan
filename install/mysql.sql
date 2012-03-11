@@ -52,10 +52,9 @@ CREATE TABLE candidates (
 CREATE TABLE elections (
   id integer NOT NULL auto_increment,
   election varchar(63) NOT NULL,
-  parent_id integer NOT NULL,
+  description text,
   status boolean NOT NULL,
   results boolean NOT NULL,
-  KEY (parent_id),
   PRIMARY KEY  (id)
 );
 

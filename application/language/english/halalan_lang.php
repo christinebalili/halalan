@@ -351,8 +351,7 @@ $lang['halalan_admin_elections_add'] = 'Add Election';
 $lang['halalan_admin_add_election_label'] = 'Add Election Details';
 $lang['halalan_admin_edit_election_label'] = 'Edit Election Details';
 $lang['halalan_admin_election_election'] = 'Election';
-$lang['halalan_admin_election_parent'] = 'Parent';
-$lang['halalan_admin_election_notes'] = 'Notes';
+$lang['halalan_admin_election_description'] = 'Description';
 $lang['halalan_admin_add_election_submit'] = 'Add Election';
 $lang['halalan_admin_edit_election_submit'] = 'Edit Election';
 

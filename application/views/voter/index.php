@@ -28,9 +28,6 @@
 			<?php echo $election['id']; ?>
 		</td>
 		<td>
-			<?php if ($election['parent_id'] > 0): ?>
-				&nbsp;&nbsp;
-			<?php endif; ?>
 			<?php echo $election['election']; ?>
 		</td>
 		<td align="center">

@@ -64,42 +64,6 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_all_by_level()
-	{
-		$this->db->from('elections');
-		$this->db->where('parent_id', '0');
-		$this->db->order_by('id', 'ASC');
-		$query = $this->db->get();
-		$parents = $query->result_array();
-		$return = array();
-		foreach ($parents as $parent)
-		{
-			$return[] = $parent;
-			$this->db->from('elections');
-			$this->db->where('parent_id', $parent['id']);
-			$this->db->order_by('id', 'ASC');
-			$query = $this->db->get();
-			$return = array_merge($return, $query->result_array());
-		}
-		return $return;
-	}
-
-	public function select_all_children_by_parent_id($id)
-	{
-		$this->db->from('elections');
-		$this->db->where('parent_id', $id);
-		$query = $this->db->get();
-		return $query->result_array();
-	}
-
-	public function select_all_parents()
-	{
-		$this->db->from('elections');
-		$this->db->where('parent_id', '0');
-		$query = $this->db->get();
-		return $query->result_array();
-	}
-
 	// all elections that have positions assigned to them
 	public function select_all_with_positions()
 	{

@@ -52,7 +52,7 @@ class Voter extends CI_Controller {
 			$voted[] = $t['election_id'];
 		}
 		$data['election_ids'] = $election_ids;
-		$data['elections'] = $this->Election->select_all_by_level();
+		$data['elections'] = $this->Election->select_all();
 		$data['voted'] = $voted;
 		$voter['index'] = TRUE; // flag to determine what to show in the main voter template
 		$voter['username'] = $this->voter['username'];

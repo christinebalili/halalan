@@ -37,7 +37,7 @@ class Elections extends CI_Controller {
 	
 	public function index()
 	{
-		$data['elections'] = $this->Election->select_all_by_level();
+		$data['elections'] = $this->Election->select_all();
 		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_elections_title');
 		$admin['body'] = $this->load->view('admin/elections', $data, TRUE);
@@ -97,14 +97,6 @@ class Elections extends CI_Controller {
 				{
 					$data['results'] = ! $election['results'];
 				}
-				if ($election['parent_id'] == 0)
-				{
-					$children = $this->Election->select_all_children_by_parent_id($id);
-					foreach ($children as $child)
-					{
-						$this->Election->update($data, $child['id']);
-					}
-				}
 				$this->Election->update($data, $id);
 				$this->session->set_flashdata('messages', array('positive', e('admin_options_election_success')));
 			}
@@ -116,7 +108,7 @@ class Elections extends CI_Controller {
 	{
 		if ($case == 'add')
 		{
-			$data['election'] = array('election' => '', 'parent_id' => '');
+			$data['election'] = array('election' => '', 'description' => '');
 		}
 		else if ($case == 'edit')
 		{
@@ -136,11 +128,11 @@ class Elections extends CI_Controller {
 			}
 		}
 		$this->form_validation->set_rules('election', e('admin_election_election'), 'required');
-		$this->form_validation->set_rules('parent_id', e('admin_election_parent'));
+		$this->form_validation->set_rules('description', e('admin_election_description'));
 		if ($this->form_validation->run())
 		{
 			$election['election'] = $this->input->post('election', TRUE);
-			$election['parent_id'] = $this->input->post('parent_id', TRUE);
+			$election['description'] = $this->input->post('description', TRUE);
 			if ($case == 'add')
 			{
 				$this->Election->insert($election);
@@ -154,7 +146,6 @@ class Elections extends CI_Controller {
 				redirect('admin/elections/edit/' . $id);
 			}
 		}
-		$data['parents'] = $this->Election->select_all_parents();
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_election_title');
 		$admin['body'] = $this->load->view('admin/election', $data, TRUE);

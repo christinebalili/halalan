@@ -26,9 +26,6 @@
 			<?php echo $election['id']; ?>
 		</td>
 		<td>
-			<?php if ($election['parent_id'] > 0): ?>
-			&nbsp;&nbsp;
-			<?php endif; ?>
 			<?php echo anchor('admin/elections/edit/' . $election['id'], $election['election']); ?>
 		</td>
 		<td align="center">
