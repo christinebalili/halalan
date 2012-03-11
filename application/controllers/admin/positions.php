@@ -37,24 +37,12 @@ class Positions extends CI_Controller {
 	
 	public function index($election_id = 0)
 	{
-		$elections = $this->Election->select_all_with_positions();
-		// If only one election exists, show it by default.
-		if (count($elections) == 1)
-		{
-			$election_id = $elections[0]['id'];
-		}
-		else if ($this->input->cookie('selected_election'))
+		if ($this->input->cookie('selected_election'))
 		{
 			$election_id = $this->input->cookie('selected_election');
 		}
-		$tmp = array();
-		foreach ($elections as $election)
-		{
-			$tmp[$election['id']] = $election['election'];
-		}
-		$elections = $tmp;
 		$data['election_id'] = $election_id;
-		$data['elections'] = $elections;
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['positions'] = $this->Position->select_all_by_election_id($election_id);
 		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_positions_title');

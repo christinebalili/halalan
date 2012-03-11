@@ -37,24 +37,12 @@ class Blocks extends CI_Controller {
 	
 	public function index($election_id = 0)
 	{
-		$elections = $this->Election->select_all_with_positions();
-		// If only one election exists, show it by default.
-		if (count($elections) == 1)
-		{
-			$election_id = $elections[0]['id'];
-		}
-		else if ($this->input->cookie('selected_election'))
+		if ($this->input->cookie('selected_election'))
 		{
 			$election_id = $this->input->cookie('selected_election');
 		}
-		$tmp = array();
-		foreach ($elections as $election)
-		{
-			$tmp[$election['id']] = $election['election'];
-		}
-		$elections = $tmp;
 		$data['election_id'] = $election_id;
-		$data['elections'] = $elections;
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['blocks'] = $this->Block->select_all_by_election_id($election_id);
 		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_blocks_title');
@@ -192,7 +180,7 @@ class Blocks extends CI_Controller {
 		{
 			$chosen_positions = $this->input->post('chosen_positions');
 		}
-		$data['elections'] = $this->Election->select_all_with_positions();
+		$data['elections'] = $this->Election->select_all();
 		$data['possible_elections'] = array();
 		$data['chosen_elections'] = array();
 		foreach ($data['elections'] as $e)

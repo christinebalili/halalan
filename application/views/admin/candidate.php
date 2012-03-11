@@ -43,17 +43,7 @@
 			<?php echo form_label(e('admin_candidate_election') . ':' , 'election_id'); ?>
 		</td>
 		<td>
-			<!-- form_dropdown and set_select don't work together :( -->
-			<select name="election_id" id="election_id" class="fillPositionsAndParties">
-				<option value="">Select Election</option>
-				<?php foreach ($elections as $election): ?>
-				<?php
-					echo '<option value="' . $election['id'] . '"';
-					echo set_select('election_id', $election['id'], $candidate['election_id'] == $election['id'] ? TRUE : FALSE);
-					echo '>' . $election['election'] . '</option>';
-				?>
-				<?php endforeach; ?>
-			</select>
+			<?php echo form_dropdown('election_id', array('' => 'Select Election') + $elections, set_value('election_id', $candidate['election_id']), 'id="election_id" class="fillPositionsAndParties"'); ?>
 		</td>
 	</tr>
 	<tr>

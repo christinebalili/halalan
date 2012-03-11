@@ -131,6 +131,22 @@ class Position extends CI_Model {
 		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
 	}
 
+	public function for_dropdown($election_id)
+	{
+		$this->db->from('positions');
+		$this->db->join('elections_positions', 'positions.id = elections_positions.position_id');
+		$this->db->where('election_id', $election_id);
+		$this->db->order_by('ordinality', 'ASC');
+		$query = $this->db->get();
+		$tmp = $query->result_array();
+		$positions = array();
+		foreach ($tmp as $t)
+		{
+			$positions[$t['id']] = $t['position'];
+		}
+		return $positions;
+	}
+
 }
 
 /* End of file position.php */

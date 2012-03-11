@@ -37,29 +37,10 @@ class Candidates extends CI_Controller {
 	
 	public function index($election_id = 0, $position_id = 0)
 	{
-		$elections = $this->Election->select_all_with_positions();
-		// If only one election exists, show it by default.
-		if (count($elections) == 1)
-		{
-			$election_id = $elections[0]['id'];
-		}
-		else if ($this->input->cookie('selected_election'))
+		if ($this->input->cookie('selected_election'))
 		{
 			$election_id = $this->input->cookie('selected_election');
 		}
-		$tmp = array();
-		foreach ($elections as $election)
-		{
-			$tmp[$election['id']] = $election['election'];
-		}
-		$elections = $tmp;
-		$pos = $this->Position->select_all_by_election_id($election_id);
-		$tmp = array();
-		foreach ($pos as $p)
-		{
-			$tmp[$p['id']] = $p['position'];
-		}
-		$pos = $tmp;
 		$positions = $this->Position->select_all_by_election_id($election_id);
 		foreach ($positions as $key => $value)
 		{
@@ -74,9 +55,9 @@ class Candidates extends CI_Controller {
 			}
 		}
 		$data['election_id'] = $election_id;
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['position_id'] = $position_id;
-		$data['elections'] = $elections;
-		$data['pos'] = $pos;
+		$data['pos'] = $this->Position->for_dropdown($election_id);
 		$data['positions'] = $positions;
 		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_candidates_title');
@@ -210,7 +191,7 @@ class Candidates extends CI_Controller {
 		{
 			$election_id = $this->input->post('election_id');
 		}
-		$data['elections'] = $this->Election->select_all_with_positions();
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['positions'] = array();
 		$data['parties'] = array();
 		if ($election_id > 0)

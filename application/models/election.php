@@ -64,15 +64,6 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	// all elections that have positions assigned to them
-	public function select_all_with_positions()
-	{
-		$this->db->from('elections');
-		$this->db->where('id IN (SELECT DISTINCT election_id FROM elections_positions)');
-		$query = $this->db->get();
-		return $query->result_array();
-	}
-
 	// elections with results should not be running
 	public function select_all_with_results()
 	{
@@ -96,6 +87,20 @@ class Election extends CI_Model {
 		$this->db->where('status', TRUE);
 		$this->db->where_in('id', $ids);
 		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+	}
+
+	public function for_dropdown()
+	{
+		$this->db->from('elections');
+		$this->db->order_by('election', 'ASC');
+		$query = $this->db->get();
+		$tmp = $query->result_array();
+		$elections = array();
+		foreach ($tmp as $t)
+		{
+			$elections[$t['id']] = $t['election'];
+		}
+		return $elections;
 	}
 
 }
