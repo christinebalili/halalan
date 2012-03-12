@@ -32,19 +32,18 @@ class Election extends CI_Model {
 
 	public function update($election, $id)
 	{
-		return $this->db->update('elections', $election, compact('id'));
+		return $this->db->update('elections', $election, array('id' => $id));
 	}
 
 	public function delete($id)
 	{
-		$this->db->where(compact('id'));
-		return $this->db->delete('elections');
+		return $this->db->delete('elections', array('id' => $id));
 	}
 
 	public function select($id)
 	{
 		$this->db->from('elections');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -74,19 +73,39 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function in_use($election_id)
+	public function select_by_election($election)
 	{
-		$this->db->from('elections_positions');
-		$this->db->where(compact('election_id'));
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		$this->db->from('elections');
+		$this->db->where('election', $election);
+		$query = $this->db->get();
+		return $query->row_array();
 	}
 
-	public function is_running($ids)
+	public function in_use($election_id)
+	{
+		$this->db->from('positions');
+		$this->db->where('election_id', $election_id);
+		$has_positions = $this->db->count_all_results() > 0 ? TRUE : FALSE;
+		$this->db->from('parties');
+		$this->db->where('election_id', $election_id);
+		$has_parties = $this->db->count_all_results() > 0 ? TRUE : FALSE;
+		return $has_positions || $has_parties ? TRUE : FALSE;
+	}
+
+	public function is_running($id)
+	{
+		$this->db->from('elections');
+		$this->db->where('status', TRUE);
+		$this->db->where('id', $id);
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
+	}
+
+	public function are_running($ids)
 	{
 		$this->db->from('elections');
 		$this->db->where('status', TRUE);
 		$this->db->where_in('id', $ids);
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
 	public function for_dropdown()

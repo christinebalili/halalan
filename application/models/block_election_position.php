@@ -28,7 +28,7 @@ class Block_Election_Position extends CI_Model {
 	public function select_all_by_block_id($block_id)
 	{
 		$this->db->from('blocks_elections_positions');
-		$this->db->where(compact('block_id'));
+		$this->db->where('block_id', $block_id);
 		$query = $this->db->get();
 		return $query->result_array();
 	}

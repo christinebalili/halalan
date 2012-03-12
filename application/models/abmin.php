@@ -28,7 +28,8 @@ class Abmin extends CI_Model {
 	public function authenticate($username, $password)
 	{
 		$this->db->from('admins');
-		$this->db->where(compact('username', 'password'));
+		$this->db->where('username', $username);
+		$this->db->where('password', $password);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -36,7 +37,7 @@ class Abmin extends CI_Model {
 	public function select($id)
 	{
 		$this->db->from('admins');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}

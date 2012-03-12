@@ -55,7 +55,7 @@ class Block extends CI_Model {
 			$this->db->where('block_id', $id);
 			$this->db->delete('blocks_elections_positions');
 		}
-		$this->db->update('blocks', $block, compact('id'));
+		$this->db->update('blocks', $block, array('id' => $id));
 		if ( ! empty($extra))
 		{
 			$block_id = $id;
@@ -73,14 +73,14 @@ class Block extends CI_Model {
 	{
 		$this->db->where('block_id', $id);
 		$this->db->delete('blocks_elections_positions');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		return $this->db->delete('blocks');
 	}
 
 	public function select($id)
 	{
 		$this->db->from('blocks');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -103,6 +103,29 @@ class Block extends CI_Model {
 		$this->db->order_by('block', 'ASC');
 		$query = $this->db->get();
 		return $query->result_array();
+	}
+
+	public function select_by_block($block)
+	{
+		$this->db->from('blocks');
+		$this->db->where('block', $block);
+		$query = $this->db->get();
+		return $query->row_array();
+	}
+
+	public function in_use($block_id)
+	{
+		$this->db->from('voters');
+		$this->db->where('block_id', $block_id);
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
+	}
+
+	public function in_running_election($block_id)
+	{
+		$this->db->from('blocks_elections_positions');
+		$this->db->where('block_id', $block_id);
+		$this->db->where('election_id IN (SELECT id FROM elections WHERE status = 1)');
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
 }

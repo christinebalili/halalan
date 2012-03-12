@@ -67,7 +67,7 @@ class Candidates extends CI_Controller {
 
 	public function add()
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if ($this->input->is_ajax_request())
 		{
 			$election_id = $this->input->post('election_id');
 			$positions = $this->Position->select_all_by_election_id($election_id);
@@ -82,7 +82,7 @@ class Candidates extends CI_Controller {
 
 	public function edit($id)
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if ($this->input->is_ajax_request())
 		{
 			$election_id = $this->input->post('election_id');
 			$positions = $this->Position->select_all_by_election_id($election_id);
@@ -150,7 +150,7 @@ class Candidates extends CI_Controller {
 			{
 				$election_id = $data['candidate']['election_id'];
 			}
-			$this->session->set_userdata('candidate', $data['candidate']); // used in callback rules
+			$this->session->set_userdata('candidate', $data['candidate']); // so callback rules know that the action is edit
 		}
 		$this->form_validation->set_rules('first_name', e('admin_candidate_first_name'), 'required|callback__rule_dependencies');
 		$this->form_validation->set_rules('last_name', e('admin_candidate_last_name'), 'required|callback__rule_candidate_exists');
@@ -206,15 +206,28 @@ class Candidates extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
+	// a candidate cannot be added to a running election
+	public function _rule_running_election()
+	{
+		if ($this->Election->is_running($this->input->post('election_id')))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_candidate_running_election'));
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	// candidates must have different names in an election
 	public function _rule_candidate_exists()
 	{
 		$first_name = trim($this->input->post('first_name', TRUE));
 		$last_name = trim($this->input->post('last_name', TRUE));
 		$alias = trim($this->input->post('alias', TRUE));
-		if ($test = $this->Candidate->select_by_name_and_alias($first_name, $last_name, $alias))
+		$test = $this->Candidate->select_by_name_and_alias($first_name, $last_name, $alias);
+		if ( ! empty($test))
 		{
 			$error = FALSE;
-			if ($candidate = $this->session->userdata('candidate')) // edit
+			if ($candidate = $this->session->userdata('candidate')) // check when in edit mode
 			{
 				if ($test['id'] != $candidate['id'])
 				{
@@ -240,39 +253,28 @@ class Candidates extends CI_Controller {
 		return TRUE;
 	}
 
-	// placed in first name so it comes up on top
+	// a candidate cannot change election when it already has votes under it
 	public function _rule_dependencies()
 	{
-		if ($candidate = $this->session->userdata('candidate')) // edit
+		if ($candidate = $this->session->userdata('candidate')) // check when in edit mode
 		{
-			// don't check if election_id or position_id is empty
-			if ($this->input->post('election_id') == FALSE || $this->input->post('position_id') == FALSE)
+			// don't check if no election or position is selected since we already have a rule for them
+			if ( ! $this->input->post('election_id') OR ! $this->input->post('position_id'))
+			{
+				return TRUE;
+			}
+			// don't check if election and position do not change
+			if ($candidate['election_id'] == $this->input->post('election_id') && $candidate['position_id'] == $this->input->post('position_id'))
 			{
 				return TRUE;
 			}
 			if ($this->Candidate->in_use($candidate['id']))
 			{
-				if ($candidate['election_id'] != $this->input->post('election_id') || $candidate['position_id'] != $this->input->post('position_id'))
-				{
-					$this->form_validation->set_message('_rule_dependencies', e('admin_candidate_dependencies'));
-					return FALSE;
-				}
+				$this->form_validation->set_message('_rule_dependencies', e('admin_candidate_dependencies'));
+				return FALSE;
 			}
 		}
 		return TRUE;
-	}
-
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running(array($this->input->post('election_id'))))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_candidate_running_election'));
-			return FALSE;
-		}
-		else
-		{
-			return TRUE;
-		}
 	}
 
 	public function _rule_picture()

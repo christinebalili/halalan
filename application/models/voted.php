@@ -32,13 +32,14 @@ class Voted extends CI_Model {
 
 	public function update($voted, $election_id, $voter_id)
 	{
-		return $this->db->update('voted', $voted, compact('election_id', 'voter_id'));
+		return $this->db->update('voted', $voted, array('election_id' => $election_id, 'voter_id' => $voter_id));
 	}
 
 	public function select($election_id, $voter_id)
 	{
 		$this->db->from('voted');
-		$this->db->where(compact('election_id', 'voter_id'));
+		$this->db->where('election_id', $election_id);
+		$this->db->where('voter_id', $voter_id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -46,7 +47,7 @@ class Voted extends CI_Model {
 	public function select_all_by_voter_id($voter_id)
 	{
 		$this->db->from('voted');
-		$this->db->where(compact('voter_id'));
+		$this->db->where('voter_id', $voter_id);
 		$query = $this->db->get();
 		return $query->result_array();
 	}

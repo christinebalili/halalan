@@ -21,6 +21,7 @@ CREATE TABLE blocks (
   id integer NOT NULL auto_increment,
   block varchar(63) NOT NULL,
   description text,
+  KEY (block),
   PRIMARY KEY  (id)
 );
 
@@ -55,6 +56,7 @@ CREATE TABLE elections (
   description text,
   status boolean NOT NULL,
   results boolean NOT NULL,
+  KEY (election),
   PRIMARY KEY  (id)
 );
 

@@ -46,7 +46,8 @@ class Abstain extends CI_Model {
 	public function count_all_by_election_id_and_position_id($election_id, $position_id)
 	{
 		$this->db->from('abstains');
-		$this->db->where(compact('election_id', 'position_id'));
+		$this->db->where('election_id', $election_id);
+		$this->db->where('position_id', $position_id);
 		return $this->db->count_all_results();
 	}
 

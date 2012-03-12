@@ -160,7 +160,7 @@ function fillPositionsAndParties() {
 			$('#position_id').append(option);
 			for (i = 0; i < positions.length; i++) {
 				option = new Option();
-				option.value = positions[i].position_id;
+				option.value = positions[i].id;
 				option.text = positions[i].position;
 				$('#position_id').append(option);
 			}
@@ -171,7 +171,7 @@ function fillPositionsAndParties() {
 			$('#party_id').append(option);
 			for (i = 0; i < parties.length; i++) {
 				option = new Option();
-				option.value = parties[i].party_id;
+				option.value = parties[i].id;
 				option.text = parties[i].party;
 				$('#party_id').append(option);
 			}

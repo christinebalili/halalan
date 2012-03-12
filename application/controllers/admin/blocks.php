@@ -52,7 +52,7 @@ class Blocks extends CI_Controller {
 
 	public function add()
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if ($this->input->is_ajax_request())
 		{
 			$election_ids = json_decode($this->input->post('election_ids', TRUE));
 			$this->_fill_positions($election_ids, TRUE);
@@ -65,7 +65,7 @@ class Blocks extends CI_Controller {
 
 	public function edit($id)
 	{
-		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest')
+		if ($this->input->is_ajax_request())
 		{
 			$election_ids = json_decode($this->input->post('election_ids', TRUE));
 			$this->_fill_positions($election_ids, TRUE);
@@ -87,19 +87,19 @@ class Blocks extends CI_Controller {
 		{
 			redirect('admin/blocks');
 		}
-		/*if ($this->Boter->in_running_election($id))
+		if ($this->Block->in_running_election($id))
 		{
-			$this->session->set_flashdata('messages', array('negative', e('admin_voter_in_running_election')));
+			$this->session->set_flashdata('messages', array('negative', e('admin_block_in_running_election')));
 		}
-		else if ($this->Boter->in_use($id))
+		else if ($this->Block->in_use($id))
 		{
-			$this->session->set_flashdata('messages', array('negative', e('admin_delete_voter_already_voted')));
+			$this->session->set_flashdata('messages', array('negative', e('admin_delete_block_in_use')));
 		}
 		else
-		{*/
+		{
 			$this->Block->delete($id);
 			$this->session->set_flashdata('messages', array('positive', e('admin_delete_block_success')));
-		//}
+		}
 		redirect('admin/blocks');
 	}
 
@@ -110,6 +110,7 @@ class Blocks extends CI_Controller {
 		if ($case == 'add')
 		{
 			$data['block'] = array('block' => '');
+			$this->session->unset_userdata('block'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')
 		{
@@ -122,11 +123,11 @@ class Blocks extends CI_Controller {
 			{
 				redirect('admin/blocks');
 			}
-			/*if ($this->Boter->in_running_election($id))
+			if ($this->Block->in_running_election($id))
 			{
-				$this->session->set_flashdata('messages', array('negative', e('admin_voter_in_running_election')));
-				redirect('admin/voters');
-			}*/
+				$this->session->set_flashdata('messages', array('negative', e('admin_block_in_running_election')));
+				redirect('admin/blocks');
+			}
 			if (empty($_POST))
 			{
 				$tmp = $this->Block_Election_Position->select_all_by_block_id($id);
@@ -137,9 +138,10 @@ class Blocks extends CI_Controller {
 				}
 				$chosen_elections = array_unique($chosen_elections);
 			}
+			$this->session->set_userdata('block', $data['block']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('block', e('admin_block_block'), 'required');
-		$this->form_validation->set_rules('chosen_elections', e('admin_block_chosen_elections'), 'required');
+		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_block_exists|callback__rule_dependencies');
+		$this->form_validation->set_rules('chosen_elections', e('admin_block_chosen_elections'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
 			$block['block'] = $this->input->post('block', TRUE);
@@ -251,6 +253,101 @@ class Blocks extends CI_Controller {
 		{
 			return $return;
 		}
+	}
+
+	// a block cannot be added to a running election
+	public function _rule_running_election()
+	{
+		if ($this->Election->are_running($this->input->post('chosen_elections')))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_block_running_election'));
+			return FALSE;
+		}
+		// additional check since an election may have no positions yet
+		if ( ! $this->input->post('general_positions') && ! $this->input->post('chosen_positions'))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_block_no_positions'));
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	// blocks must have different names
+	public function _rule_block_exists()
+	{
+		$block = trim($this->input->post('block', TRUE));
+		$test = $this->Block->select_by_block($block);
+		if ( ! empty($test))
+		{
+			$error = FALSE;
+			if ($block = $this->session->userdata('block')) // check when in edit mode
+			{
+				if ($test['id'] != $block['id'])
+				{
+					$error = TRUE;
+				}
+			}
+			else
+			{
+				$error = TRUE;
+			}
+			if ($error)
+			{
+				$message = e('admin_block_exists') . ' (' . $test['block'] . ')';
+				$this->form_validation->set_message('_rule_block_exists', $message);
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+
+	// a block cannot change election when it already has candidates under it
+	public function _rule_dependencies()
+	{
+		if ($block = $this->session->userdata('block')) // check when in edit mode
+		{
+			// don't check if no elections or positions are selected since we already have a rule for them
+			if ( ! $this->input->post('chosen_elections'))
+			{
+				return TRUE;
+			}
+			// don't check if elections and positions do not change
+			$chosen_elections = array();
+			$chosen_positions = array();
+			$tmp = $this->Block_Election_Position->select_all_by_block_id($block['id']);
+			foreach ($tmp as $t)
+			{
+				$chosen_elections[] = $t['election_id'];
+				$chosen_positions[] = $t['election_id'] . '|' . $t['position_id'];
+			}
+			$chosen_elections = array_unique($chosen_elections);
+			$fill = $this->_fill_positions($chosen_elections, FALSE);
+			$general_positions = array();
+			foreach ($fill[0] as $f)
+			{
+				$general_positions[] = $f['value'];
+			}
+			$tmp = FALSE; // not array() since $this->input->post returns FALSE when empty
+			foreach ($chosen_positions as $c)
+			{
+				// remove from $chosen_positions the general positions
+				if ( ! in_array($c, $general_positions))
+				{
+					$tmp[] = $c;
+				}
+			}
+			$chosen_positions = $tmp;
+			if ($chosen_elections == $this->input->post('chosen_elections') && $general_positions == $this->input->post('general_positions') && $chosen_positions == $this->input->post('chosen_positions'))
+			{
+				return TRUE;
+			}
+			if ($this->Block->in_use($block['id']))
+			{
+				$this->form_validation->set_message('_rule_dependencies', e('admin_block_dependencies'));
+				return FALSE;
+			}
+		}
+		return TRUE;
 	}
 
 }

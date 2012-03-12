@@ -48,7 +48,8 @@ class Vote extends CI_Model {
 		$this->db->select('count(votes.candidate_id) AS votes, candidates.id AS candidate_id');
 		$this->db->from('votes');
 		$this->db->join('candidates', 'candidates.id = votes.candidate_id', 'right');
-		$this->db->where(compact('election_id', 'position_id'));
+		$this->db->where('election_id', $election_id);
+		$this->db->where('position_id', $position_id);
 		$this->db->group_by('candidates.id');
 		$this->db->order_by('votes', 'DESC');
 		$query = $this->db->get();
@@ -59,7 +60,7 @@ class Vote extends CI_Model {
 	{
 		$this->db->from('votes');
 		$this->db->join('candidates', 'candidates.id = votes.candidate_id');
-		$this->db->where(compact('voter_id'));
+		$this->db->where('voter_id', $voter_id);
 		$this->db->order_by('last_name', 'ASC');
 		$this->db->order_by('first_name', 'ASC');
 		$query = $this->db->get();

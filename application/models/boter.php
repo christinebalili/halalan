@@ -28,7 +28,8 @@ class Boter extends CI_Model {
 	public function authenticate($username, $password)
 	{
 		$this->db->from('voters');
-		$this->db->where(compact('username', 'password'));
+		$this->db->where('username', $username);
+		$this->db->where('password', $password);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -40,19 +41,18 @@ class Boter extends CI_Model {
 
 	public function update($voter, $id)
 	{
-		return $this->db->update('voters', $voter, compact('id'));
+		return $this->db->update('voters', $voter, array('id' => $id));
 	}
 
 	public function delete($id)
 	{
-		$this->db->where(compact('id'));
-		return $this->db->delete('voters');
+		return $this->db->delete('voters', array('id' => $id));
 	}
 
 	public function select($id)
 	{
 		$this->db->from('voters');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -68,8 +68,8 @@ class Boter extends CI_Model {
 
 	public function select_all_by_block_id($block_id)
 	{
-		$this->db->where('block_id', $block_id);
 		$this->db->from('voters');
+		$this->db->where('block_id', $block_id);
 		$this->db->order_by('last_name', 'ASC');
 		$this->db->order_by('first_name', 'ASC');
 		$query = $this->db->get();
@@ -89,33 +89,25 @@ class Boter extends CI_Model {
 	public function select_by_username($username)
 	{
 		$this->db->from('voters');
-		$this->db->where(compact('username'));
+		$this->db->where('username', $username);
 		$query = $this->db->get();
 		return $query->row_array();
-	}
-
-	public function select_by_match($username)
-	{
-		$match = '%'.$username.'%';
-		$this->db->from('voters');
-		$this->db->where('name', $match);
-		$results = $this->db->get();
-		return $results->result_array();
 	}
 
 	public function in_use($voter_id)
 	{
 		$this->db->from('voted');
-		$this->db->where(compact('voter_id'));
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		$this->db->where('voter_id', $voter_id);
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
-	public function in_running_election($voter_id)
+	public function in_running_election($id)
 	{
-		$this->db->from('elections_positions_voters');
-		$this->db->where(compact('voter_id'));
+		$this->db->from('voters');
+		$this->db->join('blocks_elections_positions', 'voters.block_id = blocks_elections_positions.block_id');
+		$this->db->where('id', $id);
 		$this->db->where('election_id IN (SELECT id FROM elections WHERE status = 1)');
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
 }

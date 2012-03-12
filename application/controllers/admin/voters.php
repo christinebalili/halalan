@@ -121,7 +121,12 @@ class Voters extends CI_Controller {
 			{
 				redirect('admin/voters');
 			}
-			$this->session->set_userdata('voter', $data['voter']); // used in callback rules
+			if ($this->Boter->in_running_election($id))
+			{
+				$this->session->set_flashdata('messages', array('negative', e('admin_voter_in_running_election')));
+				redirect('admin/voters');
+			}
+			$this->session->set_userdata('voter', $data['voter']); // so callback rules know that the action is edit
 		}
 		if ($this->settings['password_pin_generation'] == 'email')
 		{
@@ -133,7 +138,7 @@ class Voters extends CI_Controller {
 		}
 		$this->form_validation->set_rules('first_name', e('admin_voter_first_name'), 'required');
 		$this->form_validation->set_rules('last_name', e('admin_voter_last_name'), 'required');
-		$this->form_validation->set_rules('block_id', e('admin_voter_block'), 'required');
+		$this->form_validation->set_rules('block_id', e('admin_voter_block'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
 			$voter['username'] = $this->input->post('username', TRUE);
@@ -391,13 +396,26 @@ class Voters extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
+	// a voter cannot be added to a running election
+	public function _rule_running_election()
+	{
+		if ($this->Block->in_running_election($this->input->post('block_id')))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_voter_running_election'));
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	// voters must have different usernames
 	public function _rule_voter_exists()
 	{
 		$username = trim($this->input->post('username', TRUE));
-		if ($test = $this->Boter->select_by_username($username))
+		$test = $this->Boter->select_by_username($username);
+		if ( ! empty($test))
 		{
 			$error = FALSE;
-			if ($voter = $this->session->userdata('voter')) // edit
+			if ($voter = $this->session->userdata('voter')) // check when in edit mode
 			{
 				if ($test['id'] != $voter['id'])
 				{
@@ -418,39 +436,28 @@ class Voters extends CI_Controller {
 		return TRUE;
 	}
 
-	// placed in username so it comes up on top
+	// a voter cannot change block when she already has voted
 	public function _rule_dependencies()
 	{
-		if ($voter = $this->session->userdata('voter')) // edit
+		if ($voter = $this->session->userdata('voter')) // check when in edit mode
 		{
-			// don't check if block_id is empty
-			if ($this->input->post('block_id') == FALSE)
+			// don't check if no block is selected since we already have a rule for this
+			if ( ! $this->input->post('block_id'))
+			{
+				return TRUE;
+			}
+			// don't check if block does not change
+			if ($voter['block_id'] == $this->input->post('block_id'))
 			{
 				return TRUE;
 			}
 			if ($this->Boter->in_use($voter['id']))
 			{
-				if ($voter['block_id'] != $this->input->post('block_id'))
-				{
-					$this->form_validation->set_message('_rule_dependencies', e('admin_voter_dependencies'));
-					return FALSE;
-				}
+				$this->form_validation->set_message('_rule_dependencies', e('admin_voter_dependencies'));
+				return FALSE;
 			}
 		}
 		return TRUE;
-	}
-
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running($this->input->post('chosen_elections')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_voter_running_election'));
-			return FALSE;
-		}
-		else
-		{
-			return TRUE;
-		}
 	}
 
 	public function _rule_csv()
