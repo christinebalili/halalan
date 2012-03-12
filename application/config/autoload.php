@@ -109,7 +109,7 @@ $autoload['language'] = array('halalan');
 |
 */
 
-$autoload['model'] = array('Abmin', 'Abstain', 'Block', 'Block_Election_Position', 'Boter', 'Candidate', 'Election', 'Election_Party', 'Election_Position', 'Party', 'Position', 'Vote', 'Voted');
+$autoload['model'] = array('Abmin', 'Abstain', 'Block', 'Block_Election_Position', 'Boter', 'Candidate', 'Election', 'Election_Position', 'Party', 'Position', 'Vote', 'Voted');
 
 
 /* End of file autoload.php */

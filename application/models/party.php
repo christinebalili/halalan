@@ -27,50 +27,23 @@ class Party extends CI_Model {
 
 	public function insert($party)
 	{
-		$chosen = $party['chosen'];
-		unset($party['chosen']);
-		$this->db->insert('parties', $party);
-		if ( ! empty($chosen))
-		{
-			$party_id = $this->db->insert_id();
-			foreach ($chosen as $election_id)
-			{
-				$this->db->insert('elections_parties', compact('election_id', 'party_id'));
-			}
-		}
-		return TRUE;
+		return $this->db->insert('parties', $party);
 	}
 
 	public function update($party, $id)
 	{
-		$chosen = $party['chosen'];
-		unset($party['chosen']);
-		$this->db->update('parties', $party, compact('id'));
-		if ( ! empty($chosen))
-		{
-			$this->db->where('party_id', $id);
-			$this->db->delete('elections_parties');
-			$party_id = $id;
-			foreach ($chosen as $election_id)
-			{
-				$this->db->insert('elections_parties', compact('election_id', 'party_id'));
-			}
-		}
-		return TRUE;
+		return $this->db->update('parties', $party, array('id' => $id));
 	}
 
 	public function delete($id)
 	{
-		$this->db->where('party_id', $id);
-		$this->db->delete('elections_parties');
-		$this->db->where(compact('id'));
-		return $this->db->delete('parties');
+		return $this->db->delete('parties', array('id' => $id));
 	}
 
 	public function select($id)
 	{
 		$this->db->from('parties');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -85,7 +58,6 @@ class Party extends CI_Model {
 	public function select_all_by_election_id($election_id)
 	{
 		$this->db->from('parties');
-		$this->db->join('elections_parties', 'parties.id = elections_parties.party_id');
 		$this->db->where('election_id', $election_id);
 		$this->db->order_by('party', 'ASC');
 		$query = $this->db->get();
@@ -95,7 +67,7 @@ class Party extends CI_Model {
 	public function select_by_party($party)
 	{
 		$this->db->from('parties');
-		$this->db->where(compact('party'));
+		$this->db->where('party', $party);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -103,16 +75,16 @@ class Party extends CI_Model {
 	public function in_use($party_id)
 	{
 		$this->db->from('candidates');
-		$this->db->where(compact('party_id'));
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		$this->db->where('party_id', $party_id);
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
-	public function in_running_election($party_id)
+	public function in_running_election($id)
 	{
-		$this->db->from('candidates');
-		$this->db->where(compact('party_id'));
+		$this->db->from('parties');
+		$this->db->where('id', $id);
 		$this->db->where('election_id IN (SELECT id FROM elections WHERE status = 1)');
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
 }

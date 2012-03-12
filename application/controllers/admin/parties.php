@@ -89,10 +89,9 @@ class Parties extends CI_Controller {
 
 	public function _party($case, $id = null)
 	{
-		$chosen = array();
 		if ($case == 'add')
 		{
-			$data['party'] = array('party' => '', 'alias' => '', 'description' => '');
+			$data['party'] = array('election_id' => '', 'party' => '', 'alias' => '', 'description' => '');
 			$this->session->unset_userdata('party'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')
@@ -111,27 +110,19 @@ class Parties extends CI_Controller {
 				$this->session->set_flashdata('messages', array('negative', e('admin_party_in_running_election')));
 				redirect('admin/parties');			
 			}
-			if (empty($_POST))
-			{
-				$tmp = $this->Election_Party->select_all_by_party_id($id);
-				foreach ($tmp as $t)
-				{
-					$chosen[] = $t['election_id'];
-				}
-			}
-			$this->session->set_userdata('party', $data['party']); // used in callback rules
+			$this->session->set_userdata('party', $data['party']); // so callback rules know that the action is edit
 		}
+		$this->form_validation->set_rules('election_id', e('admin_party_election'), 'required|callback__rule_running_election');
 		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_party_exists|callback__rule_dependencies');
 		$this->form_validation->set_rules('alias', e('admin_party_alias'));
 		$this->form_validation->set_rules('description', e('admin_party_description'));
-		$this->form_validation->set_rules('chosen[]', e('admin_party_chosen_elections'), 'required|callback__rule_running_election');
 		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_logo');
 		if ($this->form_validation->run())
 		{
+			$party['election_id'] = $this->input->post('election_id', TRUE);
 			$party['party'] = $this->input->post('party', TRUE);
 			$party['alias'] = $this->input->post('alias', TRUE);
 			$party['description'] = $this->input->post('description', TRUE);
-			$party['chosen'] = $this->input->post('chosen', TRUE);
 			if ($logo = $this->session->userdata('party_logo'))
 			{
 				$party['logo'] = $logo;
@@ -150,24 +141,7 @@ class Parties extends CI_Controller {
 				redirect('admin/parties/edit/' . $id);
 			}
 		}
-		if ($this->input->post('chosen'))
-		{
-			$chosen = $this->input->post('chosen');
-		}
-		$data['elections'] = $this->Election->select_all();
-		$data['possible'] = array();
-		$data['chosen'] = array();
-		foreach ($data['elections'] as $e)
-		{
-			if (in_array($e['id'], $chosen))
-			{
-				$data['chosen'][$e['id']] = $e['election'];
-			}
-			else
-			{
-				$data['possible'][$e['id']] = $e['election'];
-			}
-		}
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_party_title');
 		$admin['body'] = $this->load->view('admin/party', $data, TRUE);
@@ -175,13 +149,26 @@ class Parties extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
+	// a party cannot be added to a running election
+	public function _rule_running_election()
+	{
+		if ($this->Election->is_running($this->input->post('election_id')))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_party_running_election'));
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	// parties must have different names in an election
 	public function _rule_party_exists()
 	{
 		$party = trim($this->input->post('party', TRUE));
-		if ($test = $this->Party->select_by_party($party))
+		$test = $this->Party->select_by_party($party);
+		if ( ! empty($test) && $test['election_id'] == $this->input->post('election_id'))
 		{
 			$error = FALSE;
-			if ($party = $this->session->userdata('party')) // edit
+			if ($party = $this->session->userdata('party')) // check when in edit mode
 			{
 				if ($test['id'] != $party['id'])
 				{
@@ -199,50 +186,31 @@ class Parties extends CI_Controller {
 				return FALSE;
 			}
 		}
-		else
-		{
-			return TRUE;
-		}
+		return TRUE;
 	}
 
-	// placed in position so it comes up on top
+	// a party cannot change election when it already has candidates under it
 	public function _rule_dependencies()
 	{
-		if ($party = $this->session->userdata('party')) // edit
+		if ($party = $this->session->userdata('party')) // check when in edit mode
 		{
-			// don't check if chosen is empty
-			if ($this->input->post('chosen') == FALSE)
+			// don't check if no election is selected since we already have a rule for this
+			if ( ! $this->input->post('election_id'))
+			{
+				return TRUE;
+			}
+			// don't check if election does not change
+			if ($party['election_id'] == $this->input->post('election_id'))
 			{
 				return TRUE;
 			}
 			if ($this->Party->in_use($party['id']))
 			{
-				$tmp = $this->Election_Party->select_all_by_party_id($party['id']);
-				foreach ($tmp as $t)
-				{
-					$chosen[] = $t['election_id'];
-				}
-				if ($chosen != $this->input->post('chosen'))
-				{
-					$this->form_validation->set_message('_rule_dependencies', e('admin_party_dependencies'));
-					return FALSE;
-				}
+				$this->form_validation->set_message('_rule_dependencies', e('admin_party_dependencies'));
+				return FALSE;
 			}
 		}
 		return TRUE;
-	}
-
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running($this->input->post('chosen')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_party_running_election'));
-			return FALSE;
-		}
-		else
-		{
-			return TRUE;
-		}
 	}
 
 	public function _rule_logo()

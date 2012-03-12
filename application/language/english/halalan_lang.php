@@ -160,10 +160,11 @@ $lang['halalan_admin_delete_party_success'] = 'The party has been successfully d
 $lang['halalan_admin_edit_party_title'] = 'Edit Party';
 $lang['halalan_admin_add_party_title'] = 'Add Party';
 $lang['halalan_admin_party_exists'] = 'Party already exists';
-$lang['halalan_admin_party_dependencies'] = 'The party is in use.  The Chosen Elections field cannot be edited.';
+$lang['halalan_admin_party_dependencies'] = 'The party is in use.  The Election field cannot be edited.';
 $lang['halalan_admin_add_party_success'] = 'The party has been successfully added.';
 $lang['halalan_admin_edit_party_success'] = 'The party has been successfully edited.';
 $lang['halalan_admin_party_in_running_election'] = 'A party in a running election cannot be modifed.';
+$lang['halalan_admin_party_running_election'] = 'A party cannot be added to a running election.';
 
 // controllers/admin/positions.php
 $lang['halalan_admin_positions_title'] = 'Manage Positions';
@@ -263,13 +264,10 @@ $lang['halalan_admin_parties_add'] = 'Add Party';
 // views/admin/party.php
 $lang['halalan_admin_add_party_label'] = 'Add Party Details';
 $lang['halalan_admin_edit_party_label'] = 'Edit Party Details';
+$lang['halalan_admin_party_election'] = 'Election';
 $lang['halalan_admin_party_party'] = 'Party';
 $lang['halalan_admin_party_alias'] = 'Alias';
 $lang['halalan_admin_party_description'] = 'Description';
-$lang['halalan_admin_party_elections'] = 'Elections';
-$lang['halalan_admin_party_no_elections'] = 'No elections found.  Create one in the Elections page.';
-$lang['halalan_admin_party_possible_elections'] = 'Possible Elections';
-$lang['halalan_admin_party_chosen_elections'] = 'Chosen Elections';
 $lang['halalan_admin_party_logo'] = 'Logo';
 $lang['halalan_admin_add_party_submit'] = 'Add Party';
 $lang['halalan_admin_edit_party_submit'] = 'Edit Party';
