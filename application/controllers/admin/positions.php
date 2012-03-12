@@ -89,10 +89,9 @@ class Positions extends CI_Controller {
 
 	public function _position($case, $id = null)
 	{
-		$chosen = array();
 		if ($case == 'add')
 		{
-			$data['position'] = array('position' => '', 'description' => '', 'maximum' => '', 'ordinality' => '', 'abstain' => '1', 'unit' => '0');
+			$data['position'] = array('election_id' => '', 'position' => '', 'description' => '', 'maximum' => '', 'ordinality' => '', 'abstain' => '1', 'unit' => '0');
 			$this->session->unset_userdata('position'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')
@@ -111,32 +110,24 @@ class Positions extends CI_Controller {
 				$this->session->set_flashdata('messages', array('negative', e('admin_position_in_running_election')));
 				redirect('admin/positions');
 			}
-			if (empty($_POST))
-			{
-				$tmp = $this->Election_Position->select_all_by_position_id($id);
-				foreach ($tmp as $t)
-				{
-					$chosen[] = $t['election_id'];
-				}
-			}
 			$this->session->set_userdata('position', $data['position']); // used in callback rules
 		}
+		$this->form_validation->set_rules('election_id', e('admin_position_election'), 'required|callback__rule_running_election');
 		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_position_exists|callback__rule_dependencies');
 		$this->form_validation->set_rules('description', e('admin_position_description'));
 		$this->form_validation->set_rules('maximum', e('admin_position_maximum'), 'required|is_natural_no_zero');
 		$this->form_validation->set_rules('ordinality', e('admin_position_ordinality'), 'required|is_natural_no_zero');
 		$this->form_validation->set_rules('abstain', e('admin_position_abstain'));
 		$this->form_validation->set_rules('unit', e('admin_position_unit'));
-		$this->form_validation->set_rules('chosen[]', e('admin_position_chosen_elections'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
+			$position['election_id'] = $this->input->post('election_id', TRUE);
 			$position['position'] = $this->input->post('position', TRUE);
 			$position['description'] = $this->input->post('description', TRUE);
 			$position['maximum'] = $this->input->post('maximum', TRUE);
 			$position['ordinality'] = $this->input->post('ordinality', TRUE);
 			$position['abstain'] = $this->input->post('abstain', TRUE);
 			$position['unit'] = $this->input->post('unit', TRUE);
-			$position['chosen'] = $this->input->post('chosen', TRUE);
 			if ($case == 'add')
 			{
 				$this->Position->insert($position);
@@ -150,24 +141,7 @@ class Positions extends CI_Controller {
 				redirect('admin/positions/edit/' . $id);
 			}
 		}
-		if ($this->input->post('chosen'))
-		{
-			$chosen = $this->input->post('chosen');
-		}
-		$data['elections'] = $this->Election->select_all();
-		$data['possible'] = array();
-		$data['chosen'] = array();
-		foreach ($data['elections'] as $e)
-		{
-			if (in_array($e['id'], $chosen))
-			{
-				$data['chosen'][$e['id']] = $e['election'];
-			}
-			else
-			{
-				$data['possible'][$e['id']] = $e['election'];
-			}
-		}
+		$data['elections'] = $this->Election->for_dropdown();
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_position_title');
 		$admin['body'] = $this->load->view('admin/position', $data, TRUE);
@@ -175,13 +149,26 @@ class Positions extends CI_Controller {
 		$this->load->view('admin', $admin);
 	}
 
+	// a position cannot be added to a running election
+	public function _rule_running_election()
+	{
+		if ($this->Election->is_running($this->input->post('election_id')))
+		{
+			$this->form_validation->set_message('_rule_running_election', e('admin_position_running_election'));
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	// positions must have different names in an election
 	public function _rule_position_exists()
 	{
 		$position = trim($this->input->post('position', TRUE));
-		if ($test = $this->Position->select_by_position($position))
+		$test = $this->Position->select_by_position($position);
+		if ( ! empty($test) && $test['election_id'] == $this->input->post('election_id'))
 		{
 			$error = FALSE;
-			if ($position = $this->session->userdata('position')) // edit
+			if ($position = $this->session->userdata('position')) // check when in edit mode
 			{
 				if ($test['id'] != $position['id'])
 				{
@@ -202,44 +189,28 @@ class Positions extends CI_Controller {
 		return TRUE;
 	}
 
-	// placed in position so it comes up on top
+	// a position cannot change election when it already has candidates under it
 	public function _rule_dependencies()
 	{
-		if ($position = $this->session->userdata('position')) // edit
+		if ($position = $this->session->userdata('position')) // check when in edit mode
 		{
-			// don't check if chosen is empty
-			if ($this->input->post('chosen') == FALSE)
+			// don't check if no election is selected since we already have a rule for this
+			if ( ! $this->input->post('election_id'))
+			{
+				return TRUE;
+			}
+			// don't check if election does not change
+			if ($position['election_id'] == $this->input->post('election_id'))
 			{
 				return TRUE;
 			}
 			if ($this->Position->in_use($position['id']))
 			{
-				$tmp = $this->Election_Position->select_all_by_position_id($position['id']);
-				foreach ($tmp as $t)
-				{
-					$chosen[] = $t['election_id'];
-				}
-				if ($chosen != $this->input->post('chosen'))
-				{
-					$this->form_validation->set_message('_rule_dependencies', e('admin_position_dependencies'));
-					return FALSE;
-				}
+				$this->form_validation->set_message('_rule_dependencies', e('admin_position_dependencies'));
+				return FALSE;
 			}
 		}
 		return TRUE;
-	}
-
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running($this->input->post('chosen')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_position_running_election'));
-			return FALSE;
-		}
-		else
-		{
-			return TRUE;
-		}
 	}
 
 }

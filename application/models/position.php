@@ -27,52 +27,26 @@ class Position extends CI_Model {
 
 	public function insert($position)
 	{
-		$chosen = $position['chosen'];
-		unset($position['chosen']);
-		$this->db->insert('positions', $position);
-		if ( ! empty($chosen))
-		{
-			$position_id = $this->db->insert_id();
-			foreach ($chosen as $election_id)
-			{
-				$this->db->insert('elections_positions', compact('election_id', 'position_id'));
-			}
-		}
-		return TRUE;
+		return $this->db->insert('positions', $position);
 	}
 
 	public function update($position, $id)
 	{
-		$chosen = $position['chosen'];
-		unset($position['chosen']);
-		$this->db->update('positions', $position, compact('id'));
-		if ( ! empty($chosen))
-		{
-			$this->db->where('position_id', $id);
-			$this->db->delete('elections_positions');
-			$position_id = $id;
-			foreach ($chosen as $election_id)
-			{
-				$this->db->insert('elections_positions', compact('election_id', 'position_id'));
-			}
-		}
-		return TRUE;
+		return $this->db->update('positions', $position, array('id' => $id));
 	}
 
 	public function delete($id)
 	{
 		$this->db->where('position_id', $id);
-		$this->db->delete('elections_positions');
-		$this->db->where('position_id', $id);
 		$this->db->delete('blocks_elections_positions');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		return $this->db->delete('positions');
 	}
 
 	public function select($id)
 	{
 		$this->db->from('positions');
-		$this->db->where(compact('id'));
+		$this->db->where('id', $id);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -97,7 +71,6 @@ class Position extends CI_Model {
 	public function select_all_by_election_id($election_id)
 	{
 		$this->db->from('positions');
-		$this->db->join('elections_positions', 'positions.id = elections_positions.position_id');
 		$this->db->where('election_id', $election_id);
 		$this->db->order_by('ordinality', 'ASC');
 		$query = $this->db->get();
@@ -107,7 +80,7 @@ class Position extends CI_Model {
 	public function select_by_position($position)
 	{
 		$this->db->from('positions');
-		$this->db->where(compact('position'));
+		$this->db->where('position', $position);
 		$query = $this->db->get();
 		return $query->row_array();
 	}
@@ -115,26 +88,25 @@ class Position extends CI_Model {
 	public function in_use($position_id)
 	{
 		$this->db->from('candidates');
-		$this->db->where(compact('position_id'));
+		$this->db->where('position_id', $position_id);
 		$has_candidates = $this->db->count_all_results() > 0 ? TRUE : FALSE;
 		$this->db->from('blocks_elections_positions');
-		$this->db->where(compact('position_id'));
+		$this->db->where('position_id', $position_id);
 		$has_blocks = $this->db->count_all_results() > 0 ? TRUE : FALSE;
 		return $has_candidates || $has_blocks ? TRUE : FALSE;
 	}
 
-	public function in_running_election($position_id)
+	public function in_running_election($id)
 	{
-		$this->db->from('elections_positions');
-		$this->db->where(compact('position_id'));
+		$this->db->from('positions');
+		$this->db->where('id', $id);
 		$this->db->where('election_id IN (SELECT id FROM elections WHERE status = 1)');
-		return ($this->db->count_all_results() > 0) ? TRUE : FALSE;
+		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
 	public function for_dropdown($election_id)
 	{
 		$this->db->from('positions');
-		$this->db->join('elections_positions', 'positions.id = elections_positions.position_id');
 		$this->db->where('election_id', $election_id);
 		$this->db->order_by('ordinality', 'ASC');
 		$query = $this->db->get();

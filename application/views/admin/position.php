@@ -1,11 +1,19 @@
 <?php echo display_messages(validation_errors('<li>', '</li>'), $this->session->flashdata('messages')); ?>
 <?php if ($action == 'add'): ?>
-	<?php echo form_open('admin/positions/add', array('class' => 'selectChosen')); ?>
+	<?php echo form_open('admin/positions/add'); ?>
 <?php elseif ($action == 'edit'): ?>
-	<?php echo form_open('admin/positions/edit/' . $position['id'], array('class' => 'selectChosen')); ?>
+	<?php echo form_open('admin/positions/edit/' . $position['id']); ?>
 <?php endif; ?>
 <h2><?php echo e('admin_' . $action . '_position_label'); ?></h2>
 <table cellpadding="0" cellspacing="0" border="0" class="form_table" width="100%">
+	<tr>
+		<td class="w20" align="right">
+			<?php echo form_label(e('admin_position_election') . ':', 'election_id'); ?>
+		</td>
+		<td>
+			<?php echo form_dropdown('election_id', array('' => 'Select Election') + $elections, set_value('election_id', $position['election_id']), 'id="election_id"'); ?>
+		</td>
+	</tr>
 	<tr>
 		<td class="w20" align="right">
 			<?php echo form_label(e('admin_position_position') . ':', 'position'); ?>
@@ -58,36 +66,6 @@
 			<?php echo form_label('General', 'general'); ?>
 			<?php echo form_radio('unit', '1', set_value('unit', $position['unit']) == 1 ? TRUE : FALSE, 'id="specific"'); ?>
 			<?php echo form_label('Specific', 'specific'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
-			<?php echo e('admin_position_elections'); ?>:
-		</td>
-		<td>
-			<?php if (empty($elections)): ?>
-			<em><?php echo e('admin_position_no_elections'); ?></em>
-			<?php else: ?>
-				<table>
-					<tr>
-						<td>
-							<?php echo form_dropdown('possible[]', (count($possible)) ? $possible : array(), '', 'id="possible" multiple="multiple" size="7" style="width : 170px;"'); ?>
-							<br />
-							<?php echo form_label(e('admin_position_possible_elections'), 'possible'); ?>
-						</td>
-						<td>
-							<input type="button" class="copySelected" value="  &gt;&gt;  " />
-							<br />
-							<input type="button" class="copySelected" value="  &lt;&lt;  " />
-						</td>
-						<td>
-							<?php echo form_dropdown('chosen[]', (count($chosen)) ? $chosen : array(), '', 'id="chosen" multiple="multiple" size="7" style="width : 170px;"'); ?>
-							<br />
-							<?php echo form_label(e('admin_position_chosen_elections'), 'chosen'); ?>
-						</td>
-					</tr>
-				</table>
-			<?php endif; ?>
 		</td>
 	</tr>
 </table>
