@@ -33,12 +33,12 @@
 			<?php echo e('admin_import_sample'); ?>:
 		</td>
 		<td>
-			<?php if ($settings['password_pin_generation'] == 'web'): ?>
+			<?php if ($this->config->item('halalan_password_pin_generation') == 'web'): ?>
 			Username,Last Name,First Name<br />
 			user1,Suzumiya,Haruhi<br />
 			user2,Izumi,Konata<br />
 			user3,Etoh,Mei
-			<?php elseif ($settings['password_pin_generation'] == 'email'): ?>
+			<?php elseif ($this->config->item('halalan_password_pin_generation') == 'email'): ?>
 			Email,Last Name,First Name<br />
 			user1@example.com,Suzumiya,Haruhi<br />
 			user2@example.com,Izumi,Konata<br />
@@ -51,15 +51,15 @@
 			<?php echo e('admin_import_notes'); ?>:
 		</td>
 		<td>
-			<?php if ($settings['password_pin_generation'] == 'web'): ?>
+			<?php if ($this->config->item('halalan_password_pin_generation') == 'web'): ?>
 			Username
-			<?php elseif ($settings['password_pin_generation'] == 'email'): ?>
+			<?php elseif ($this->config->item('halalan_password_pin_generation') == 'email'): ?>
 			Email
 			<?php endif; ?>
 			must be unique.<br />
 			Incomplete data will be disregarded.<br />
-			Passwords <?php echo $settings['pin'] ? 'and pins ' : ''; ?>are not yet generated.<br />
-			Use <?php echo anchor('admin/voters/export', 'Export Voters'); ?> to generate passwords<?php echo $settings['pin'] ? ' and pins' : ''; ?>.
+			Passwords <?php echo $this->config->item('halalan_pin') ? 'and pins ' : ''; ?>are not yet generated.<br />
+			Use <?php echo anchor('admin/voters/export', 'Export Voters'); ?> to generate passwords<?php echo $this->config->item('halalan_pin') ? ' and pins' : ''; ?>.
 		</td>
 	</tr>
 </table>

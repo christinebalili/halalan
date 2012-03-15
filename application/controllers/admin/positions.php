@@ -18,21 +18,11 @@
  * along with Halalan.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Positions extends CI_Controller {
-
-	public $admin;
-	public $settings;
+class Positions extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->admin = $this->session->userdata('admin');
-		if ( ! $this->admin)
-		{
-			$this->session->set_flashdata('messages', array('negative', e('common_unauthorized')));
-			redirect('gate/admin');
-		}
-		$this->settings = $this->config->item('halalan');
 	}
 	
 	public function index($election_id = 0)
@@ -44,7 +34,6 @@ class Positions extends CI_Controller {
 		$data['election_id'] = $election_id;
 		$data['elections'] = $this->Election->for_dropdown();
 		$data['positions'] = $this->Position->select_all_by_election_id($election_id);
-		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_positions_title');
 		$admin['body'] = $this->load->view('admin/positions', $data, TRUE);
 		$this->load->view('admin', $admin);
@@ -145,7 +134,6 @@ class Positions extends CI_Controller {
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_position_title');
 		$admin['body'] = $this->load->view('admin/position', $data, TRUE);
-		$admin['username'] = $this->admin['username'];
 		$this->load->view('admin', $admin);
 	}
 

@@ -18,21 +18,11 @@
  * along with Halalan.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Voters extends CI_Controller {
-
-	public $admin;
-	public $settings;
+class Voters extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->admin = $this->session->userdata('admin');
-		if ( ! $this->admin)
-		{
-			$this->session->set_flashdata('messages', array('negative', e('common_unauthorized')));
-			redirect('gate/admin');
-		}
-		$this->settings = $this->config->item('halalan');
 	}
 	
 	public function index($offset = null)
@@ -58,7 +48,6 @@ class Voters extends CI_Controller {
 		$data['limit'] = $limit;
 		$data['total_rows'] = $config['total_rows'];
 		$data['voters'] = $this->Boter->select_all_for_pagination($limit, $offset);
-		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_voters_title');
 		$admin['body'] = $this->load->view('admin/voters', $data, TRUE);
 		$this->load->view('admin', $admin);
@@ -128,7 +117,7 @@ class Voters extends CI_Controller {
 			}
 			$this->session->set_userdata('voter', $data['voter']); // so callback rules know that the action is edit
 		}
-		if ($this->settings['password_pin_generation'] == 'email')
+		if ($this->config->item('halalan_password_pin_generation') == 'email')
 		{
 			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_voter_exists|callback__rule_dependencies');
 		}
@@ -147,14 +136,14 @@ class Voters extends CI_Controller {
 			$voter['block_id'] = $this->input->post('block_id', TRUE);
 			if ($case == 'add' || $this->input->post('password'))
 			{
-				$password = random_string($this->settings['password_pin_characters'], $this->settings['password_length']);
+				$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
 				$voter['password'] = sha1($password);
 			}
-			if ($this->settings['pin'])
+			if ($this->config->item('halalan_pin'))
 			{
 				if ($case == 'add' || $this->input->post('pin'))
 				{
-					$pin = random_string($this->settings['password_pin_characters'], $this->settings['pin_length']);
+					$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
 					$voter['pin'] = sha1($pin);
 				}
 			}
@@ -169,14 +158,14 @@ class Voters extends CI_Controller {
 				$this->Boter->update($voter, $id);
 				$messages[] = e('admin_edit_voter_success');
 			}
-			if ($this->settings['password_pin_generation'] == 'web')
+			if ($this->config->item('halalan_password_pin_generation') == 'web')
 			{
 				$messages[] = 'Username: '. $voter['username'];
 				if ($case == 'add' || $this->input->post('password'))
 				{
 					$messages[] = 'Password: '. $password;
 				}
-				if ($this->settings['pin'])
+				if ($this->config->item('halalan_pin'))
 				{
 					if ($case == 'add' || $this->input->post('pin'))
 					{
@@ -184,9 +173,10 @@ class Voters extends CI_Controller {
 					}
 				}
 			}
-			else if ($this->settings['password_pin_generation'] == 'email')
+			else if ($this->config->item('halalan_password_pin_generation') == 'email')
 			{
-				$this->email->from($this->admin['email'], $this->admin['first_name'] . ' ' . $this->admin['last_name']);
+				// TODO: simplify email
+				/*$this->email->from($this->admin['email'], $this->admin['first_name'] . ' ' . $this->admin['last_name']);
 				$this->email->to($voter['username']);
 				$this->email->subject($this->settings['name'] . ' Login Credentials');
 				$message = "Hello $voter[first_name] $voter[last_name],\n\nThe following are your login credentials:\nEmail: $voter[username]\n";
@@ -208,7 +198,7 @@ class Voters extends CI_Controller {
 				$this->email->message($message);
 				$this->email->send();
 				//echo $this->email->print_debugger();
-				$messages[] = e('admin_voter_email_success');
+				$messages[] = e('admin_voter_email_success');*/
 			}
 			if ($case == 'add')
 			{
@@ -223,10 +213,8 @@ class Voters extends CI_Controller {
 		}
 		$data['blocks'] = $this->Block->select_all();
 		$data['action'] = $case;
-		$data['settings'] = $this->settings;
 		$admin['title'] = e('admin_' . $case . '_voter_title');
 		$admin['body'] = $this->load->view('admin/voter', $data, TRUE);
-		$admin['username'] = $this->admin['username'];
 		$this->load->view('admin', $admin);
 	}
 
@@ -255,14 +243,14 @@ class Voters extends CI_Controller {
 				$voter['username'] = $value[0];
 				$voter['last_name'] = $value[1];
 				$voter['first_name'] = $value[2];
-				if ($voter['username'] && $voter['last_name'] && $voter['first_name'] && !$this->Boter->select_by_username($voter['username']))
+				if ($voter['username'] && $voter['last_name'] && $voter['first_name'] && ! $this->Boter->select_by_username($voter['username']))
 				{
-					if ($this->settings['password_pin_generation'] == 'web')
+					if ($this->config->item('halalan_password_pin_generation') == 'web')
 					{
 						$this->Boter->insert($voter);
 						$count++;
 					}
-					else if ($this->settings['password_pin_generation'] == 'email')
+					else if ($this->config->item('halalan_password_pin_generation') == 'email')
 					{
 						if ($this->form_validation->valid_email($voter['username']))
 						{
@@ -281,7 +269,7 @@ class Voters extends CI_Controller {
 				$success[] = $count . e('admin_import_success_plural');
 			}
 			$reminder = e('admin_import_reminder');
-			if ($this->settings['pin'])
+			if ($this->config->item('halalan_pin'))
 			{
 				$reminder = trim($reminder, '.'); // remove period
 				$reminder .= e('admin_import_reminder_too');
@@ -299,8 +287,6 @@ class Voters extends CI_Controller {
 			$this->session->unset_userdata('csv_upload_data');
 		}
 		$data['blocks'] = $this->Block->select_all();
-		$data['settings'] = $this->settings;
-		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_import_title');
 		$admin['body'] = $this->load->view('admin/import', $data, TRUE);
 		$this->load->view('admin', $admin);
@@ -312,11 +298,11 @@ class Voters extends CI_Controller {
 		if ($this->form_validation->run())
 		{
 			$header = '';
-			if ($this->settings['password_pin_generation'] == 'web')
+			if ($this->config->item('halalan_password_pin_generation') == 'web')
 			{
 				$header = 'Username';
 			}
-			else if ($this->settings['password_pin_generation'] == 'email')
+			else if ($this->config->item('halalan_password_pin_generation') == 'email')
 			{
 				$header = 'Email';
 			}
@@ -325,7 +311,7 @@ class Voters extends CI_Controller {
 			{
 				$header .= ',Password';
 			}
-			if ($this->settings['pin'])
+			if ($this->config->item('halalan_pin'))
 			{
 				if ($this->input->post('pin'))
 				{
@@ -347,16 +333,16 @@ class Voters extends CI_Controller {
 				$row = $voter['username'] . ',' . $voter['last_name'] . ',' . $voter['first_name'];
 				if ($this->input->post('password'))
 				{
-					$password = random_string($this->settings['password_pin_characters'], $this->settings['password_length']);
+					$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
 					$boter['password'] = sha1($password);
 					$row .= ',' . $password;
 					$this->Boter->update($boter, $voter['id']);
 				}
-				if ($this->settings['pin'])
+				if ($this->config->item('halalan_pin'))
 				{
 					if ($this->input->post('pin'))
 					{
-						$pin = random_string($this->settings['password_pin_characters'], $this->settings['pin_length']);
+						$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
 						$boter['pin'] = sha1($pin);
 						$row .= ',' . $pin;
 						$this->Boter->update($boter, $voter['id']);
@@ -389,8 +375,6 @@ class Voters extends CI_Controller {
 			force_download('voters.csv', $data);
 		}
 		$data['blocks'] = $this->Block->select_all();
-		$data['settings'] = $this->settings;
-		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_export_title');
 		$admin['body'] = $this->load->view('admin/export', $data, TRUE);
 		$this->load->view('admin', $admin);

@@ -40,7 +40,7 @@
 -->
 			</div>
 			<div id="header_right">
-				<p>LOGGED IN AS <?php echo strtoupper($username); ?> | <?php echo anchor('gate/logout', 'LOGOUT'); ?></p>
+				<p>LOGGED IN AS <?php echo strtoupper($this->session->userdata('username')); ?> | <?php echo anchor('gate/logout', 'LOGOUT'); ?></p>
 			</div>
 			<div class="clear"></div>
 		</div>

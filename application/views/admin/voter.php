@@ -8,7 +8,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="form_table" width="100%">
 	<tr>
 		<td class="w20" align="right">
-			<?php echo form_label(($settings['password_pin_generation'] == 'email') ? e('admin_voter_email') : e('admin_voter_username') . ':', 'username'); ?>
+			<?php echo form_label($this->config->item('halalan_password_pin_generation') == 'email' ? e('admin_voter_email') : e('admin_voter_username') . ':', 'username'); ?>
 		</td>
 		<td>
 			<?php echo form_input('username', set_value('username', $voter['username']), 'id="username" maxlength="63" class="text"'); ?>

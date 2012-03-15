@@ -31,7 +31,7 @@
 			(<?php echo e('admin_export_password_description'); ?>)
 		</td>
 	</tr>
-	<?php if ($settings['pin']): ?>
+	<?php if ($this->config->item('halalan_pin')): ?>
 	<tr>
 		<td class="w45">
 			<label for="pin">

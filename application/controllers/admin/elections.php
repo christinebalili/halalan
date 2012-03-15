@@ -18,27 +18,16 @@
  * along with Halalan.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Elections extends CI_Controller {
-
-	public $admin;
-	public $settings;
+class Elections extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->admin = $this->session->userdata('admin');
-		if ( ! $this->admin)
-		{
-			$this->session->set_flashdata('messages', array('negative', e('common_unauthorized')));
-			redirect('gate/admin');
-		}
-		$this->settings = $this->config->item('halalan');
 	}
 	
 	public function index()
 	{
 		$data['elections'] = $this->Election->select_all();
-		$admin['username'] = $this->admin['username'];
 		$admin['title'] = e('admin_elections_title');
 		$admin['body'] = $this->load->view('admin/elections', $data, TRUE);
 		$this->load->view('admin', $admin);
@@ -151,7 +140,6 @@ class Elections extends CI_Controller {
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_election_title');
 		$admin['body'] = $this->load->view('admin/election', $data, TRUE);
-		$admin['username'] = $this->admin['username'];
 		$this->load->view('admin', $admin);
 	}
 
