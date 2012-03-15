@@ -1,5 +1,5 @@
 <?php echo display_messages('', $this->session->flashdata('messages')); ?>
-<?php echo form_open('gate/admin_login', 'class="hashPassword"'); ?>
+<?php echo form_open('gate/admin', 'class="hashPassword"'); ?>
 <div class="content_center">
 	<h2><?php echo 'HALALAN ' . e('gate_admin_login_label'); ?></h2>
 	<table cellpadding="0" cellspacing="0" border="0" class="form_table">

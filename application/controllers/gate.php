@@ -25,11 +25,11 @@ class Gate extends CI_Controller {
 		parent::__construct();
 		if ( ! in_array($this->uri->segment(2), array('results', 'statistics', 'ballots', 'logout')))
 		{
-			if ($this->session->userdata('admin'))
+			if ($this->session->userdata('type') == 'admin')
 			{
 				redirect('admin/home');
 			}
-			else if ($this->session->userdata('voter'))
+			else if ($this->session->userdata('type') == 'voter')
 			{
 				redirect('voter/vote');
 			}
@@ -93,48 +93,50 @@ class Gate extends CI_Controller {
 	
 	public function admin()
 	{
+		if ($this->input->post('submit'))
+		{
+			$username = $this->input->post('username');
+			$password = $this->input->post('password');
+			if ( ! $username OR ! $password)
+			{
+				$messages = array('negative', e('gate_common_login_failure'));
+				$this->session->set_flashdata('messages', $messages);
+				redirect('gate/admin');
+			}
+			if (strlen($password) != 40)
+			{
+				$password = sha1($password);
+			}
+			if ($admin = $this->Abmin->authenticate($username, $password))
+			{
+				$this->session->set_userdata('id', $admin['id']);
+				$this->session->set_userdata('type', 'admin');
+				$this->session->set_userdata('username', $admin['username']);
+				$this->session->set_userdata('first_name', $admin['first_name']);
+				$this->session->set_userdata('last_name', $admin['last_name']);
+				$this->session->set_userdata('email', $admin['email']);
+				redirect('admin/home');
+			}
+			else
+			{
+				$messages = array('negative', e('gate_common_login_failure'));
+				$this->session->set_flashdata('messages', $messages);
+				redirect('gate/admin');
+			}
+		}
 		$gate['login'] = 'admin';
 		$gate['title'] = e('gate_admin_title');
 		$gate['body'] = $this->load->view('gate/admin', '', TRUE);
 		$this->load->view('gate', $gate);
 	}
 
-	public function admin_login()
-	{
-		if ( ! $this->input->post('username') || ! $this->input->post('password'))
-		{
-			$messages = array('negative', e('gate_common_login_failure'));
-			$this->session->set_flashdata('messages', $messages);
-			redirect('gate/admin');
-		}
-		$username = $this->input->post('username');
-		$password = $this->input->post('password');
-		if (strlen($password) != 40)
-		{
-			$password = sha1($password);
-		}
-		if ($admin = $this->Abmin->authenticate($username, $password))
-		{
-			// don't save password to session
-			unset($admin['password']);
-			$this->session->set_userdata('admin', $admin);
-			redirect('admin/home');
-		}
-		else
-		{
-			$messages = array('negative', e('gate_common_login_failure'));
-			$this->session->set_flashdata('messages', $messages);
-			redirect('gate/admin');
-		}
-	}
-
 	public function logout()
 	{
-		if ($this->session->userdata('admin'))
+		if ($this->session->userdata('type') == 'admin')
 		{
 			$gate = 'admin';
 		}
-		else if($voter = $this->session->userdata('voter'))
+		else if($voter = $this->session->userdata('voter')) // TODO: Fix this
 		{
 			// voter has not yet voted
 			$this->Boter->update(array('logout' => date("Y-m-d H:i:s")), $voter['id']);
