@@ -33,6 +33,25 @@ class MY_Controller extends CI_controller {
 		}
 	}
 
+	// used by admin to send email
+	public function _send_email($voter, $password, $pin)
+	{
+		$email = $this->session->userdata('email');
+		$admin = $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name');
+		$data['voter'] = $voter;
+		$data['password'] = $password;
+		$data['pin'] = $pin;
+		$data['admin'] = $admin;
+		$message = $this->load->view('admin/_email', $data, TRUE);
+
+		$this->email->from($email, $admin);
+		$this->email->to($voter['username']);
+		$this->email->subject('Halalan Login Credentials');
+		$this->email->message($message);
+		$this->email->send();
+		//echo $this->email->print_debugger();
+	}
+
 }
 
 /* End of file MY_Controller.php */

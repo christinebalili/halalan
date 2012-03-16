@@ -66,6 +66,7 @@ class Home extends MY_Controller {
 		{
 			$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
 			$voter['password'] = sha1($password);
+			$pin = '';
 			if ($this->config->item('halalan_pin') && $this->input->post('pin'))
 			{
 				$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
@@ -82,29 +83,14 @@ class Home extends MY_Controller {
 			{
 				$success[] = 'Username: '. $voter['username'];
 				$success[] = 'Password: '. $password;
-				if ($this->config->item('halalan_pin') && $this->input->post('pin'))
+				if ( ! empty($pin))
 				{
 					$success[] = 'PIN: '. $pin;
 				}
 			}
 			else if ($this->config->item('halalan_password_pin_generation') == 'email')
 			{
-				$this->email->from($this->session->userdata('email'), $this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name'));
-				$this->email->to($voter['username']);
-				$this->email->subject('Halalan Login Credentials');
-				$message = "Hello $voter[first_name] $voter[last_name],\n\nThe following are your login credentials:\nEmail: $voter[username]\n";
-				$message .= "Password: $password\n";
-				if ($this->config->item('halalan_pin') && $this->input->post('pin'))
-				{
-					$message .= "PIN: $pin\n";
-				}
-				$message .= "\n";
-				$message .= ($this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name'));
-				$message .= "\n";
-				$message .= 'Halalan Administrator';
-				$this->email->message($message);
-				$this->email->send();
-				//echo $this->email->print_debugger();
+				$this->_send_email($voter, $password, $pin);
 				$success[] = e('admin_regenerate_email_success');
 			}
 			$this->session->set_flashdata('messages', array_merge(array('positive'), $success));

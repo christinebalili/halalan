@@ -130,6 +130,8 @@ class Voters extends MY_Controller {
 		$this->form_validation->set_rules('block_id', e('admin_voter_block'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
+			$password = '';
+			$pin = '';
 			$voter['username'] = $this->input->post('username', TRUE);
 			$voter['last_name'] = $this->input->post('last_name', TRUE);
 			$voter['first_name'] = $this->input->post('first_name', TRUE);
@@ -160,45 +162,23 @@ class Voters extends MY_Controller {
 			}
 			if ($this->config->item('halalan_password_pin_generation') == 'web')
 			{
-				$messages[] = 'Username: '. $voter['username'];
-				if ($case == 'add' || $this->input->post('password'))
+				if ( ! empty($password))
 				{
 					$messages[] = 'Password: '. $password;
 				}
-				if ($this->config->item('halalan_pin'))
+				if ( ! empty($pin))
 				{
-					if ($case == 'add' || $this->input->post('pin'))
-					{
-						$messages[] = 'PIN: '. $pin;
-					}
+					$messages[] = 'PIN: '. $pin;
 				}
 			}
 			else if ($this->config->item('halalan_password_pin_generation') == 'email')
 			{
-				// TODO: simplify email
-				/*$this->email->from($this->admin['email'], $this->admin['first_name'] . ' ' . $this->admin['last_name']);
-				$this->email->to($voter['username']);
-				$this->email->subject($this->settings['name'] . ' Login Credentials');
-				$message = "Hello $voter[first_name] $voter[last_name],\n\nThe following are your login credentials:\nEmail: $voter[username]\n";
-				if ($case == 'add' || $this->input->post('password'))
+				$messages[] = 'Username: '. $voter['username'];
+				if ( ! empty($password) OR ! empty($pin))
 				{
-					$message .= "Password: $password\n";
+					$this->_send_email($voter, $password, $pin);
+					$messages[] = e('admin_voter_email_success');
 				}
-				if ($this->settings['pin'])
-				{
-					if ($case == 'add' || $this->input->post('pin'))
-					{
-						$message .= "PIN: $pin\n";
-					}
-				}
-				$message .= "\n";
-				$message .= ($this->admin['first_name'] . ' ' . $this->admin['last_name']);
-				$message .= "\n";
-				$message .= $this->settings['name'] . ' Administrator';
-				$this->email->message($message);
-				$this->email->send();
-				//echo $this->email->print_debugger();
-				$messages[] = e('admin_voter_email_success');*/
 			}
 			if ($case == 'add')
 			{
