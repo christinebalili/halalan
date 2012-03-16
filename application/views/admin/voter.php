@@ -56,7 +56,7 @@
 		<td>
 			<?php echo form_checkbox('password', TRUE, FALSE, 'id="password"'); ?>				
 			<?php echo form_label(e('admin_voter_password'), 'password'); ?>
-			<?php if ($settings['pin']): ?>
+			<?php if ($this->config->item('halalan_pin')): ?>
 				<?php echo form_checkbox('pin', TRUE, FALSE, 'id="pin"'); ?>				
 				<?php echo form_label(e('admin_voter_pin'), 'pin'); ?>
 			<?php endif; ?>
