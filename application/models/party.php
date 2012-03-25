@@ -64,14 +64,6 @@ class Party extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_by_party($party)
-	{
-		$this->db->from('parties');
-		$this->db->where('party', $party);
-		$query = $this->db->get();
-		return $query->row_array();
-	}
-
 	public function in_use($party_id)
 	{
 		$this->db->from('candidates');

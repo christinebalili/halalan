@@ -129,7 +129,7 @@ class Blocks extends MY_Controller {
 			}
 			$this->session->set_userdata('block', $data['block']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_block_exists|callback__rule_dependencies');
+		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_is_existing[block.blocks.block]|callback__rule_dependencies');
 		$this->form_validation->set_rules('chosen_elections', e('admin_block_chosen_elections'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
@@ -256,35 +256,6 @@ class Blocks extends MY_Controller {
 		{
 			$this->form_validation->set_message('_rule_running_election', e('admin_block_no_positions'));
 			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// blocks must have different names
-	public function _rule_block_exists()
-	{
-		$block = trim($this->input->post('block', TRUE));
-		$test = $this->Block->select_by_block($block);
-		if ( ! empty($test))
-		{
-			$error = FALSE;
-			if ($block = $this->session->userdata('block')) // check when in edit mode
-			{
-				if ($test['id'] != $block['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$message = e('admin_block_exists') . ' (' . $test['block'] . ')';
-				$this->form_validation->set_message('_rule_block_exists', $message);
-				return FALSE;
-			}
 		}
 		return TRUE;
 	}

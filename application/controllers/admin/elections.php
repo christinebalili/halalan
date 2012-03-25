@@ -118,7 +118,7 @@ class Elections extends MY_Controller {
 			}
 			$this->session->set_userdata('election', $data['election']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('election', e('admin_election_election'), 'required|callback__rule_election_exists');
+		$this->form_validation->set_rules('election', e('admin_election_election'), 'required|callback__rule_is_existing[election.elections.election]');
 		$this->form_validation->set_rules('description', e('admin_election_description'));
 		if ($this->form_validation->run())
 		{
@@ -141,35 +141,6 @@ class Elections extends MY_Controller {
 		$admin['title'] = e('admin_' . $case . '_election_title');
 		$admin['body'] = $this->load->view('admin/election', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	// elections must have different names
-	public function _rule_election_exists()
-	{
-		$election = trim($this->input->post('election', TRUE));
-		$test = $this->Election->select_by_election($election);
-		if ( ! empty($test))
-		{
-			$error = FALSE;
-			if ($election = $this->session->userdata('election')) // check when in edit mode
-			{
-				if ($test['id'] != $election['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$message = e('admin_election_exists') . ' (' . $test['election'] . ')';
-				$this->form_validation->set_message('_rule_election_exists', $message);
-				return FALSE;
-			}
-		}
-		return TRUE;
 	}
 
 }

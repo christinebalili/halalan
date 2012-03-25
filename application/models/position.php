@@ -77,14 +77,6 @@ class Position extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_by_position($position)
-	{
-		$this->db->from('positions');
-		$this->db->where('position', $position);
-		$query = $this->db->get();
-		return $query->row_array();
-	}
-
 	public function in_use($position_id)
 	{
 		$this->db->from('candidates');

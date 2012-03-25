@@ -52,6 +52,52 @@ class MY_Controller extends CI_controller {
 		//echo $this->email->print_debugger();
 	}
 
+	// additional form validation rules
+	public function _rule_is_existing($str, $module_table_fields)
+	{
+		// modified is_unique rule
+		list($module, $table, $fields) = explode('.', $module_table_fields);
+		$fields = explode(',', $fields);
+		$where = array();
+		foreach ($fields as $field)
+		{
+			$where[$field] = $this->input->post($field, TRUE);
+		}
+		$query = $this->db->limit(1)->get_where($table, $where);
+		$test = $query->row_array();
+		if ( ! empty($test))
+		{
+			$error = FALSE;
+			if ($data = $this->session->userdata($module)) // check when in edit mode
+			{
+				if ($test['id'] != $data['id'])
+				{
+					$error = TRUE;
+				}
+			}
+			else
+			{
+				$error = TRUE;
+			}
+			if ($error)
+			{
+				$value = $test[$fields[0]];
+				if ($module == 'candidate')
+				{
+					$value = $test[$fields[0]] . ', ' . $test[$fields[1]];
+					if ( ! empty($test[$fields[2]]))
+					{
+						$value .= ' "' . $test[$fields[2]] . '"';
+					}
+				}
+				$message = e('admin_' . $module . '_exists') . ' (' . $value . ')';
+				$this->form_validation->set_message('_rule_is_existing', $message);
+				return FALSE;
+			}
+		}
+		return TRUE;
+	}
+
 }
 
 /* End of file MY_Controller.php */

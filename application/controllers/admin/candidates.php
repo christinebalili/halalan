@@ -142,7 +142,7 @@ class Candidates extends MY_Controller {
 			$this->session->set_userdata('candidate', $data['candidate']); // so callback rules know that the action is edit
 		}
 		$this->form_validation->set_rules('first_name', e('admin_candidate_first_name'), 'required|callback__rule_dependencies');
-		$this->form_validation->set_rules('last_name', e('admin_candidate_last_name'), 'required|callback__rule_candidate_exists');
+		$this->form_validation->set_rules('last_name', e('admin_candidate_last_name'), 'required|callback__rule_is_existing[candidate.candidates.last_name,first_name,alias]');
 		$this->form_validation->set_rules('alias', e('admin_candidate_alias'));
 		$this->form_validation->set_rules('description', e('admin_candidate_description'));
 		$this->form_validation->set_rules('election_id', e('admin_candidate_election'), 'required|callback__rule_running_election');
@@ -201,42 +201,6 @@ class Candidates extends MY_Controller {
 		{
 			$this->form_validation->set_message('_rule_running_election', e('admin_candidate_running_election'));
 			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// candidates must have different names in an election
-	public function _rule_candidate_exists()
-	{
-		$first_name = trim($this->input->post('first_name', TRUE));
-		$last_name = trim($this->input->post('last_name', TRUE));
-		$alias = trim($this->input->post('alias', TRUE));
-		$test = $this->Candidate->select_by_name_and_alias($first_name, $last_name, $alias);
-		if ( ! empty($test))
-		{
-			$error = FALSE;
-			if ($candidate = $this->session->userdata('candidate')) // check when in edit mode
-			{
-				if ($test['id'] != $candidate['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$name = $test['last_name'] . ', ' . $test['first_name'];
-				if ( ! empty($test['alias']))
-				{
-					$name .= ' "' . $test['alias'] . '"';
-				}
-				$message = e('admin_candidate_exists') . ' (' . $name . ')';
-				$this->form_validation->set_message('_rule_candidate_exists', $message);
-				return FALSE;
-			}
 		}
 		return TRUE;
 	}

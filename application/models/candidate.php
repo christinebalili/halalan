@@ -58,16 +58,6 @@ class Candidate extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_by_name_and_alias($first_name, $last_name, $alias = '')
-	{
-		$this->db->from('candidates');
-		$this->db->where('first_name', $first_name);
-		$this->db->where('last_name', $last_name);
-		$this->db->where('alias', $alias);
-		$query = $this->db->get();
-		return $query->row_array();
-	}
-
 	public function in_use($candidate_id)
 	{
 		$this->db->from('votes');

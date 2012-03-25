@@ -119,11 +119,11 @@ class Voters extends MY_Controller {
 		}
 		if ($this->config->item('halalan_password_pin_generation') == 'email')
 		{
-			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_voter_exists|callback__rule_dependencies');
+			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_is_existing[voter.voters.username]|callback__rule_dependencies');
 		}
 		else
 		{
-			$this->form_validation->set_rules('username', e('admin_voter_username'), 'required|callback__rule_voter_exists|callback__rule_dependencies');
+			$this->form_validation->set_rules('username', e('admin_voter_username'), 'required|callback__rule_is_existing[voter.voters.username]|callback__rule_dependencies');
 		}
 		$this->form_validation->set_rules('first_name', e('admin_voter_first_name'), 'required');
 		$this->form_validation->set_rules('last_name', e('admin_voter_last_name'), 'required');
@@ -367,35 +367,6 @@ class Voters extends MY_Controller {
 		{
 			$this->form_validation->set_message('_rule_running_election', e('admin_voter_running_election'));
 			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// voters must have different usernames
-	public function _rule_voter_exists()
-	{
-		$username = trim($this->input->post('username', TRUE));
-		$test = $this->Boter->select_by_username($username);
-		if ( ! empty($test))
-		{
-			$error = FALSE;
-			if ($voter = $this->session->userdata('voter')) // check when in edit mode
-			{
-				if ($test['id'] != $voter['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$message = e('admin_voter_exists') . ' (' . $test['username'] . ')';
-				$this->form_validation->set_message('_rule_voter_exists', $message);
-				return FALSE;
-			}
 		}
 		return TRUE;
 	}

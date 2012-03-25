@@ -102,7 +102,7 @@ class Positions extends MY_Controller {
 			$this->session->set_userdata('position', $data['position']); // used in callback rules
 		}
 		$this->form_validation->set_rules('election_id', e('admin_position_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_position_exists|callback__rule_dependencies');
+		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_is_existing[position.positions.position,election_id]|callback__rule_dependencies');
 		$this->form_validation->set_rules('description', e('admin_position_description'));
 		$this->form_validation->set_rules('maximum', e('admin_position_maximum'), 'required|is_natural_no_zero');
 		$this->form_validation->set_rules('ordinality', e('admin_position_ordinality'), 'required|is_natural_no_zero');
@@ -144,35 +144,6 @@ class Positions extends MY_Controller {
 		{
 			$this->form_validation->set_message('_rule_running_election', e('admin_position_running_election'));
 			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// positions must have different names in an election
-	public function _rule_position_exists()
-	{
-		$position = trim($this->input->post('position', TRUE));
-		$test = $this->Position->select_by_position($position);
-		if ( ! empty($test) && $test['election_id'] == $this->input->post('election_id'))
-		{
-			$error = FALSE;
-			if ($position = $this->session->userdata('position')) // check when in edit mode
-			{
-				if ($test['id'] != $position['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$message = e('admin_position_exists') . ' (' . $test['position'] . ')';
-				$this->form_validation->set_message('_rule_position_exists', $message);
-				return FALSE;
-			}
 		}
 		return TRUE;
 	}

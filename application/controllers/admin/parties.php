@@ -102,7 +102,7 @@ class Parties extends MY_Controller {
 			$this->session->set_userdata('party', $data['party']); // so callback rules know that the action is edit
 		}
 		$this->form_validation->set_rules('election_id', e('admin_party_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_party_exists|callback__rule_dependencies');
+		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_is_existing[party.parties.party,election_id]|callback__rule_dependencies');
 		$this->form_validation->set_rules('alias', e('admin_party_alias'));
 		$this->form_validation->set_rules('description', e('admin_party_description'));
 		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_logo');
@@ -144,35 +144,6 @@ class Parties extends MY_Controller {
 		{
 			$this->form_validation->set_message('_rule_running_election', e('admin_party_running_election'));
 			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// parties must have different names in an election
-	public function _rule_party_exists()
-	{
-		$party = trim($this->input->post('party', TRUE));
-		$test = $this->Party->select_by_party($party);
-		if ( ! empty($test) && $test['election_id'] == $this->input->post('election_id'))
-		{
-			$error = FALSE;
-			if ($party = $this->session->userdata('party')) // check when in edit mode
-			{
-				if ($test['id'] != $party['id'])
-				{
-					$error = TRUE;
-				}
-			}
-			else
-			{
-				$error = TRUE;
-			}
-			if ($error)
-			{
-				$message = e('admin_party_exists') . ' (' . $test['party'] . ')';
-				$this->form_validation->set_message('_rule_party_exists', $message);
-				return FALSE;
-			}
 		}
 		return TRUE;
 	}

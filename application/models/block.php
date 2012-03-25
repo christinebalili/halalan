@@ -105,14 +105,6 @@ class Block extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_by_block($block)
-	{
-		$this->db->from('blocks');
-		$this->db->where('block', $block);
-		$query = $this->db->get();
-		return $query->row_array();
-	}
-
 	public function in_use($block_id)
 	{
 		$this->db->from('voters');

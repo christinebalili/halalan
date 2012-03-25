@@ -73,14 +73,6 @@ class Election extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_by_election($election)
-	{
-		$this->db->from('elections');
-		$this->db->where('election', $election);
-		$query = $this->db->get();
-		return $query->row_array();
-	}
-
 	public function in_use($election_id)
 	{
 		$this->db->from('positions');
