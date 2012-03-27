@@ -40,7 +40,7 @@ function copySelectedWithAjax() {
 		$.ajax({
 			type: "POST",
 			url: window.location.href,
-			data: "election_ids=[" + array + "]",
+			data: "election_ids=[" + array + "]&halalan_csrf_token_name=" + $('input[name="halalan_csrf_token_name"]').val(),
 			success: function(msg){
 				var msg = $.parseJSON(msg);
 				var general = msg[0];
@@ -148,7 +148,7 @@ function fillPositionsAndParties() {
 	$.ajax({
 		type: "POST",
 		url: window.location.href,
-		data: $(this).serialize(),
+		data: $(this).serialize() + '&halalan_csrf_token_name=' + $('input[name="halalan_csrf_token_name"]').val(),
 		success: function(msg){
 			var msg = $.parseJSON(msg);
 			var positions = msg[0];
