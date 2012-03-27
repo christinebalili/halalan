@@ -23,6 +23,7 @@ class Blocks extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->set_module('block');
 	}
 	
 	public function index($election_id = 0)
@@ -44,7 +45,7 @@ class Blocks extends MY_Controller {
 		if ($this->input->is_ajax_request())
 		{
 			$election_ids = json_decode($this->input->post('election_ids', TRUE));
-			$this->_fill_positions($election_ids, TRUE);
+			echo json_encode($this->_fill_positions($election_ids));
 		}
 		else
 		{
@@ -57,7 +58,7 @@ class Blocks extends MY_Controller {
 		if ($this->input->is_ajax_request())
 		{
 			$election_ids = json_decode($this->input->post('election_ids', TRUE));
-			$this->_fill_positions($election_ids, TRUE);
+			echo json_encode($this->_fill_positions($election_ids));
 		}
 		else
 		{
@@ -129,7 +130,7 @@ class Blocks extends MY_Controller {
 			}
 			$this->session->set_userdata('block', $data['block']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_is_existing[block.blocks.block]|callback__rule_dependencies');
+		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_is_existing[blocks.block]|callback__rule_dependencies');
 		$this->form_validation->set_rules('chosen_elections', e('admin_block_chosen_elections'), 'required|callback__rule_running_election');
 		if ($this->form_validation->run())
 		{
@@ -185,7 +186,7 @@ class Blocks extends MY_Controller {
 				$data['possible_elections'][$e['id']] = '(' . $e['id'] . ') ' . $e['election'];
 			}
 		}
-		$fill = $this->_fill_positions($chosen_elections, FALSE);
+		$fill = $this->_fill_positions($chosen_elections);
 		$data['general_positions'] = array();
 		foreach ($fill[0] as $f)
 		{
@@ -209,104 +210,6 @@ class Blocks extends MY_Controller {
 		$admin['title'] = e('admin_' . $case . '_block_title');
 		$admin['body'] = $this->load->view('admin/block', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	public function _fill_positions($election_ids, $json)
-	{
-		$general = array();
-		$specific = array();
-		foreach ($election_ids as $election_id)
-		{
-			$positions = $this->Position->select_all_by_election_id($election_id);
-			foreach ($positions as $position)
-			{
-				$value = $election_id . '|' . $position['id'];
-				$text = $position['position'] . ' (' . $election_id . ')';
-				if ($position['unit'])
-				{
-					$specific[] = array('value' => $value, 'text' => $text);
-				}
-				else
-				{
-					$general[] = array('value' => $value, 'text' => $text);
-				}
-			}
-		}
-		$return = array($general, $specific);
-		if ($json)
-		{
-			echo json_encode($return);
-		}
-		else
-		{
-			return $return;
-		}
-	}
-
-	// a block cannot be added to a running election
-	public function _rule_running_election()
-	{
-		if ($this->Election->are_running($this->input->post('chosen_elections')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_block_running_election'));
-			return FALSE;
-		}
-		// additional check since an election may have no positions yet
-		if ( ! $this->input->post('general_positions') && ! $this->input->post('chosen_positions'))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_block_no_positions'));
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// a block cannot change election when it already has candidates under it
-	public function _rule_dependencies()
-	{
-		if ($block = $this->session->userdata('block')) // check when in edit mode
-		{
-			// don't check if no elections or positions are selected since we already have a rule for them
-			if ( ! $this->input->post('chosen_elections'))
-			{
-				return TRUE;
-			}
-			// don't check if elections and positions do not change
-			$chosen_elections = array();
-			$chosen_positions = array();
-			$tmp = $this->Block_Election_Position->select_all_by_block_id($block['id']);
-			foreach ($tmp as $t)
-			{
-				$chosen_elections[] = $t['election_id'];
-				$chosen_positions[] = $t['election_id'] . '|' . $t['position_id'];
-			}
-			$chosen_elections = array_unique($chosen_elections);
-			$fill = $this->_fill_positions($chosen_elections, FALSE);
-			$general_positions = array();
-			foreach ($fill[0] as $f)
-			{
-				$general_positions[] = $f['value'];
-			}
-			$tmp = FALSE; // not array() since $this->input->post returns FALSE when empty
-			foreach ($chosen_positions as $c)
-			{
-				// remove from $chosen_positions the general positions
-				if ( ! in_array($c, $general_positions))
-				{
-					$tmp[] = $c;
-				}
-			}
-			$chosen_positions = $tmp;
-			if ($chosen_elections == $this->input->post('chosen_elections') && $general_positions == $this->input->post('general_positions') && $chosen_positions == $this->input->post('chosen_positions'))
-			{
-				return TRUE;
-			}
-			if ($this->Block->in_use($block['id']))
-			{
-				$this->form_validation->set_message('_rule_dependencies', e('admin_block_dependencies'));
-				return FALSE;
-			}
-		}
-		return TRUE;
 	}
 
 }

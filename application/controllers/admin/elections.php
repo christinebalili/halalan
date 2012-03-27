@@ -23,6 +23,7 @@ class Elections extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->set_module('election');
 	}
 	
 	public function index()
@@ -118,7 +119,7 @@ class Elections extends MY_Controller {
 			}
 			$this->session->set_userdata('election', $data['election']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('election', e('admin_election_election'), 'required|callback__rule_is_existing[election.elections.election]');
+		$this->form_validation->set_rules('election', e('admin_election_election'), 'required|callback__rule_is_existing[elections.election]');
 		$this->form_validation->set_rules('description', e('admin_election_description'));
 		if ($this->form_validation->run())
 		{

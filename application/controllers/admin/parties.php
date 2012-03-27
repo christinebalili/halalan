@@ -23,6 +23,7 @@ class Parties extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->set_module('party');
 	}
 	
 	public function index($election_id = 0)
@@ -102,7 +103,7 @@ class Parties extends MY_Controller {
 			$this->session->set_userdata('party', $data['party']); // so callback rules know that the action is edit
 		}
 		$this->form_validation->set_rules('election_id', e('admin_party_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_is_existing[party.parties.party,election_id]|callback__rule_dependencies');
+		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_is_existing[parties.party,election_id]|callback__rule_dependencies');
 		$this->form_validation->set_rules('alias', e('admin_party_alias'));
 		$this->form_validation->set_rules('description', e('admin_party_description'));
 		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_logo');
@@ -135,41 +136,6 @@ class Parties extends MY_Controller {
 		$admin['title'] = e('admin_' . $case . '_party_title');
 		$admin['body'] = $this->load->view('admin/party', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	// a party cannot be added to a running election
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running($this->input->post('election_id')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_party_running_election'));
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// a party cannot change election when it already has candidates under it
-	public function _rule_dependencies()
-	{
-		if ($party = $this->session->userdata('party')) // check when in edit mode
-		{
-			// don't check if no election is selected since we already have a rule for this
-			if ( ! $this->input->post('election_id'))
-			{
-				return TRUE;
-			}
-			// don't check if election does not change
-			if ($party['election_id'] == $this->input->post('election_id'))
-			{
-				return TRUE;
-			}
-			if ($this->Party->in_use($party['id']))
-			{
-				$this->form_validation->set_message('_rule_dependencies', e('admin_party_dependencies'));
-				return FALSE;
-			}
-		}
-		return TRUE;
 	}
 
 	public function _rule_logo()

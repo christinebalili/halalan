@@ -23,6 +23,7 @@ class Positions extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->set_module('position');
 	}
 	
 	public function index($election_id = 0)
@@ -102,7 +103,7 @@ class Positions extends MY_Controller {
 			$this->session->set_userdata('position', $data['position']); // used in callback rules
 		}
 		$this->form_validation->set_rules('election_id', e('admin_position_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_is_existing[position.positions.position,election_id]|callback__rule_dependencies');
+		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_is_existing[positions.position,election_id]|callback__rule_dependencies');
 		$this->form_validation->set_rules('description', e('admin_position_description'));
 		$this->form_validation->set_rules('maximum', e('admin_position_maximum'), 'required|is_natural_no_zero');
 		$this->form_validation->set_rules('ordinality', e('admin_position_ordinality'), 'required|is_natural_no_zero');
@@ -135,41 +136,6 @@ class Positions extends MY_Controller {
 		$admin['title'] = e('admin_' . $case . '_position_title');
 		$admin['body'] = $this->load->view('admin/position', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	// a position cannot be added to a running election
-	public function _rule_running_election()
-	{
-		if ($this->Election->is_running($this->input->post('election_id')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_position_running_election'));
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// a position cannot change election when it already has candidates under it
-	public function _rule_dependencies()
-	{
-		if ($position = $this->session->userdata('position')) // check when in edit mode
-		{
-			// don't check if no election is selected since we already have a rule for this
-			if ( ! $this->input->post('election_id'))
-			{
-				return TRUE;
-			}
-			// don't check if election does not change
-			if ($position['election_id'] == $this->input->post('election_id'))
-			{
-				return TRUE;
-			}
-			if ($this->Position->in_use($position['id']))
-			{
-				$this->form_validation->set_message('_rule_dependencies', e('admin_position_dependencies'));
-				return FALSE;
-			}
-		}
-		return TRUE;
 	}
 
 }

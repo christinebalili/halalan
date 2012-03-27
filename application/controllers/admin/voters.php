@@ -23,6 +23,7 @@ class Voters extends MY_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->set_module('voter');
 	}
 	
 	public function index($offset = null)
@@ -119,11 +120,11 @@ class Voters extends MY_Controller {
 		}
 		if ($this->config->item('halalan_password_pin_generation') == 'email')
 		{
-			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_is_existing[voter.voters.username]|callback__rule_dependencies');
+			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_is_existing[voters.username]|callback__rule_dependencies');
 		}
 		else
 		{
-			$this->form_validation->set_rules('username', e('admin_voter_username'), 'required|callback__rule_is_existing[voter.voters.username]|callback__rule_dependencies');
+			$this->form_validation->set_rules('username', e('admin_voter_username'), 'required|callback__rule_is_existing[voters.username]|callback__rule_dependencies');
 		}
 		$this->form_validation->set_rules('first_name', e('admin_voter_first_name'), 'required');
 		$this->form_validation->set_rules('last_name', e('admin_voter_last_name'), 'required');
@@ -358,41 +359,6 @@ class Voters extends MY_Controller {
 		$admin['title'] = e('admin_export_title');
 		$admin['body'] = $this->load->view('admin/export', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	// a voter cannot be added to a running election
-	public function _rule_running_election()
-	{
-		if ($this->Block->in_running_election($this->input->post('block_id')))
-		{
-			$this->form_validation->set_message('_rule_running_election', e('admin_voter_running_election'));
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	// a voter cannot change block when she already has voted
-	public function _rule_dependencies()
-	{
-		if ($voter = $this->session->userdata('voter')) // check when in edit mode
-		{
-			// don't check if no block is selected since we already have a rule for this
-			if ( ! $this->input->post('block_id'))
-			{
-				return TRUE;
-			}
-			// don't check if block does not change
-			if ($voter['block_id'] == $this->input->post('block_id'))
-			{
-				return TRUE;
-			}
-			if ($this->Boter->in_use($voter['id']))
-			{
-				$this->form_validation->set_message('_rule_dependencies', e('admin_voter_dependencies'));
-				return FALSE;
-			}
-		}
-		return TRUE;
 	}
 
 	public function _rule_csv()
