@@ -51,5 +51,6 @@ define('HALALAN_PICTURE_SIZE', 96);
 define('HALALAN_PER_PAGE', 50);
 define('HALALAN_VERSION', 'Dev');
 
+
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

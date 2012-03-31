@@ -375,4 +375,6 @@ $lang['halalan_admin_block_chosen_positions'] = 'Chosen Positions';
 $lang['halalan_admin_add_block_submit'] = 'Add Block';
 $lang['halalan_admin_edit_block_submit'] = 'Edit Block';
 
-?>
+
+/* End of file halalan_lang.php */
+/* Location: ./application/language/english/halalan_lang.php */
