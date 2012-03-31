@@ -202,7 +202,7 @@ class Voters extends MY_Controller {
 	public function import()
 	{
 		$this->form_validation->set_rules('block_id', e('admin_import_block'), 'required');
-		$this->form_validation->set_rules('csv', e('admin_import_csv'), 'callback__rule_csv');
+		$this->form_validation->set_rules('csv', e('admin_import_csv'), 'callback__rule_upload_csv');
 		if ($this->form_validation->run())
 		{
 			$voter['password'] = '';
@@ -359,25 +359,6 @@ class Voters extends MY_Controller {
 		$admin['title'] = e('admin_export_title');
 		$admin['body'] = $this->load->view('admin/export', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	public function _rule_csv()
-	{
-		$config['upload_path'] = HALALAN_UPLOAD_PATH . 'csvs/';
-		$config['allowed_types'] = 'csv';
-		$this->upload->initialize($config);
-		if (!$this->upload->do_upload('csv'))
-		{
-			$message = $this->upload->display_errors('', '');
-			$this->form_validation->set_message('_rule_csv', $message);
-			return FALSE;
-		}
-		else
-		{
-			$upload_data = $this->upload->data();
-			$this->session->set_userdata('csv_upload_data', $upload_data);
-			return TRUE;
-		}
 	}
 
 }

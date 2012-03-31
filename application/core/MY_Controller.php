@@ -240,7 +240,76 @@ class MY_Controller extends CI_controller {
 		return TRUE;
 	}
 
-	// used by blocks
+	public function _rule_upload_csv()
+	{
+		$config['upload_path'] = HALALAN_UPLOAD_PATH . 'csvs/';
+		$config['allowed_types'] = 'csv';
+		$this->upload->initialize($config);
+		if ( ! $this->upload->do_upload('csv'))
+		{
+			$message = $this->upload->display_errors('', '');
+			$this->form_validation->set_message('_rule_upload_csv', $message);
+			return FALSE;
+		}
+		else
+		{
+			$upload_data = $this->upload->data();
+			$this->session->set_userdata('csv_upload_data', $upload_data);
+			return TRUE;
+		}
+	}
+
+	public function _rule_upload_image()
+	{
+		$config['allowed_types'] = HALALAN_ALLOWED_TYPES;
+		$config['encrypt_name'] = TRUE;
+		if ($this->module == 'party')
+		{
+			$config['upload_path'] = HALALAN_UPLOAD_PATH . 'logos/';
+			$type = 'logo';
+			$size = HALALAN_LOGO_SIZE;
+		}
+		else if ($this->module == 'candidate')
+		{
+			$config['upload_path'] = HALALAN_UPLOAD_PATH . 'pictures/';
+			$type = 'picture';
+			$size = HALALAN_PICTURE_SIZE;
+		}
+		if ($_FILES[$type]['error'] != UPLOAD_ERR_NO_FILE)
+		{
+			$this->upload->initialize($config);
+			if ( ! $this->upload->do_upload($type))
+			{
+				$message = $this->upload->display_errors('', '');
+				$this->form_validation->set_message('_rule_upload_image', $message);
+				return FALSE;
+			}
+			else
+			{
+				$upload_data = $this->upload->data();
+				$return = $this->_resize($upload_data, $size);
+				if ($return != 'OKS')
+				{
+					unlink($upload_data['full_path']);
+					$this->form_validation->set_message('_rule_upload_image', $return);
+					return FALSE;
+				}
+				else
+				{
+					if ($test = $this->session->userdata($this->module)) // edit
+					{
+						// delete old image first
+						unlink($config['upload_path'] . $test[$type]);
+					}
+					$this->session->set_userdata('image_upload_data', $upload_data['file_name']);
+					return TRUE;
+				}
+			}
+		}
+		return TRUE;
+	}
+
+	// used in _rule_dependencies and blocks controller
 	public function _fill_positions($election_ids)
 	{
 		$general = array();
@@ -263,6 +332,27 @@ class MY_Controller extends CI_controller {
 			}
 		}
 		return array($general, $specific);
+	}
+
+	// used in _rule_upload_image
+	public function _resize($upload_data, $n)
+	{
+		$error = array();
+		$width = $upload_data['image_width'];
+		$height = $upload_data['image_height'];
+		if ($width > $n OR $height > $n)
+		{
+			$config['source_image'] = $upload_data['full_path'];
+			$config['quality'] = '100%';
+			$config['width'] = $n;
+			$config['height'] = ($n * $height) / $width;
+			$this->image_lib->initialize($config);
+			if ( ! $this->image_lib->resize())
+			{
+				return $this->image_lib->display_errors();
+			}
+		}
+		return 'OKS';
 	}
 
 }

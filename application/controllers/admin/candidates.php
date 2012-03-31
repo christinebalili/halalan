@@ -106,6 +106,10 @@ class Candidates extends MY_Controller {
 		}
 		else
 		{
+			if ( ! empty($candidate['picture']))
+			{
+				unlink(HALALAN_UPLOAD_PATH . 'pictures/' . $candidate['picture']);
+			}
 			$this->Candidate->delete($id);
 			$this->session->set_flashdata('messages', array('positive', e('admin_delete_candidate_success')));
 		}
@@ -149,7 +153,7 @@ class Candidates extends MY_Controller {
 		$this->form_validation->set_rules('election_id', e('admin_candidate_election'), 'required|callback__rule_running_election');
 		$this->form_validation->set_rules('position_id', e('admin_candidate_position'), 'required');
 		$this->form_validation->set_rules('party_id', e('admin_candidate_party'));
-		$this->form_validation->set_rules('picture', e('admin_candidate_picture'), 'callback__rule_picture');
+		$this->form_validation->set_rules('picture', e('admin_candidate_picture'), 'callback__rule_upload_image');
 		if ($this->form_validation->run())
 		{
 			$candidate['first_name'] = $this->input->post('first_name', TRUE);
@@ -159,10 +163,10 @@ class Candidates extends MY_Controller {
 			$candidate['election_id'] = $this->input->post('election_id', TRUE);
 			$candidate['position_id'] = $this->input->post('position_id', TRUE);
 			$candidate['party_id'] = $this->input->post('party_id', TRUE);
-			if ($picture = $this->session->userdata('candidate_picture'))
+			if ($picture = $this->session->userdata('image_upload_data'))
 			{
 				$candidate['picture'] = $picture;
-				$this->session->unset_userdata('candidate_picture');
+				$this->session->unset_userdata('image_upload_data');
 			}
 			if ($case == 'add')
 			{
@@ -175,6 +179,14 @@ class Candidates extends MY_Controller {
 				$this->Candidate->update($candidate, $id);
 				$this->session->set_flashdata('messages', array('positive', e('admin_edit_candidate_success')));
 				redirect('admin/candidates/edit/' . $id);
+			}
+		}
+		else
+		{
+			if ($picture = $this->session->userdata('image_upload_data'))
+			{
+				unlink(HALALAN_UPLOAD_PATH . 'pictures/' . $picture);
+				$this->session->unset_userdata('image_upload_data');
 			}
 		}
 		if ($this->input->post('election_id'))
@@ -193,81 +205,6 @@ class Candidates extends MY_Controller {
 		$admin['title'] = e('admin_' . $case . '_candidate_title');
 		$admin['body'] = $this->load->view('admin/candidate', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	public function _rule_picture()
-	{
-		if ($_FILES['picture']['error'] != UPLOAD_ERR_NO_FILE)
-		{
-			$config['upload_path'] = HALALAN_UPLOAD_PATH . 'pictures/';
-			$config['allowed_types'] = HALALAN_ALLOWED_TYPES;
-			$this->upload->initialize($config);
-			if ($candidate = $this->session->userdata('candidate')) // edit
-			{
-				// delete old logo first
-				unlink($config['upload_path'] . $candidate['picture']);
-			}
-			if ( ! $this->upload->do_upload('picture'))
-			{
-				$message = $this->upload->display_errors('', '');
-				$this->form_validation->set_message('_rule_picture', $message);
-				return FALSE;
-			}
-			else
-			{
-				$upload_data = $this->upload->data();
-				$return = $this->_resize($upload_data, 96);
-				if (is_array($return))
-				{
-					$this->form_validation->set_message('_rule_picture', $return[0]);
-					return FALSE;
-				}
-				else
-				{
-					// flashdata doesn't work I don't know why
-					$this->session->set_userdata('candidate_picture', $return);
-					return TRUE;
-				}
-			}
-		}
-		else
-		{
-			return TRUE;
-		}
-	}
-
-	public function _resize($upload_data, $n)
-	{
-		$width = $upload_data['image_width'];
-		$height = $upload_data['image_height'];
-		if ($width > $n || $height > $n)
-		{
-			$config['source_image'] = $upload_data['full_path'];
-			$config['quality'] = '100%';
-			$config['width'] = $n;
-			$config['height'] = (($n*$height)/$width);
-			$this->image_lib->initialize($config);
-			if ( ! $this->image_lib->resize())
-			{
-				$error[] = $this->image_lib->display_errors();
-			}
-			else
-			{
-				$name = $upload_data['file_name'];
-			}
-		}
-		else
-		{
-			$name = $upload_data['file_name'];
-		}
-		if (empty($error))
-		{
-			return $name;
-		}
-		else
-		{
-			return $error;
-		}
 	}
 
 }

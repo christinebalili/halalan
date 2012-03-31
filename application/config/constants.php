@@ -46,9 +46,10 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 */
 define('HALALAN_UPLOAD_PATH', './public/uploads/');
 define('HALALAN_ALLOWED_TYPES', 'gif|jpg|png');
+define('HALALAN_LOGO_SIZE', 250);
+define('HALALAN_PICTURE_SIZE', 96);
 define('HALALAN_PER_PAGE', 50);
 define('HALALAN_VERSION', 'Dev');
-
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

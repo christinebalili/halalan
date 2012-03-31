@@ -71,6 +71,10 @@ class Parties extends MY_Controller {
 		}
 		else
 		{
+			if ( ! empty($party['logo']))
+			{
+				unlink(HALALAN_UPLOAD_PATH . 'logos/' . $party['logo']);
+			}
 			$this->Party->delete($id);
 			$this->session->set_flashdata('messages', array('positive', e('admin_delete_party_success')));
 		}
@@ -106,17 +110,17 @@ class Parties extends MY_Controller {
 		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_is_existing[parties.party,election_id]|callback__rule_dependencies');
 		$this->form_validation->set_rules('alias', e('admin_party_alias'));
 		$this->form_validation->set_rules('description', e('admin_party_description'));
-		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_logo');
+		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_upload_image');
 		if ($this->form_validation->run())
 		{
 			$party['election_id'] = $this->input->post('election_id', TRUE);
 			$party['party'] = $this->input->post('party', TRUE);
 			$party['alias'] = $this->input->post('alias', TRUE);
 			$party['description'] = $this->input->post('description', TRUE);
-			if ($logo = $this->session->userdata('party_logo'))
+			if ($logo = $this->session->userdata('image_upload_data'))
 			{
 				$party['logo'] = $logo;
-				$this->session->unset_userdata('party_logo');
+				$this->session->unset_userdata('image_upload_data');
 			}
 			if ($case == 'add')
 			{
@@ -131,86 +135,19 @@ class Parties extends MY_Controller {
 				redirect('admin/parties/edit/' . $id);
 			}
 		}
+		else
+		{
+			if ($logo = $this->session->userdata('image_upload_data'))
+			{
+				unlink(HALALAN_UPLOAD_PATH . 'logos/' . $logo);
+				$this->session->unset_userdata('image_upload_data');
+			}
+		}
 		$data['elections'] = $this->Election->for_dropdown();
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_party_title');
 		$admin['body'] = $this->load->view('admin/party', $data, TRUE);
 		$this->load->view('admin', $admin);
-	}
-
-	public function _rule_logo()
-	{
-		if ($_FILES['logo']['error'] != UPLOAD_ERR_NO_FILE)
-		{
-			$config['upload_path'] = HALALAN_UPLOAD_PATH . 'logos/';
-			$config['allowed_types'] = HALALAN_ALLOWED_TYPES;
-			$this->upload->initialize($config);
-			if ($party = $this->session->userdata('party')) // edit
-			{
-				// delete old logo first
-				unlink($config['upload_path'] . $party['logo']);
-			}
-			if ( ! $this->upload->do_upload('logo'))
-			{
-				$message = $this->upload->display_errors('', '');
-				$this->form_validation->set_message('_rule_logo', $message);
-				return FALSE;
-			}
-			else
-			{
-				$upload_data = $this->upload->data();
-				$return = $this->_resize($upload_data, 250);
-				if (is_array($return))
-				{
-					$this->form_validation->set_message('_rule_logo', $return[0]);
-					return FALSE;
-				}
-				else
-				{
-					// flashdata doesn't work I don't know why
-					$this->session->set_userdata('party_logo', $return);
-					return TRUE;
-				}
-			}
-		}
-		else
-		{
-			return TRUE;
-		}
-	}
-
-	public function _resize($upload_data, $n)
-	{
-		$width = $upload_data['image_width'];
-		$height = $upload_data['image_height'];
-		if ($width > $n || $height > $n)
-		{
-			$config['source_image'] = $upload_data['full_path'];
-			$config['quality'] = '100%';
-			$config['width'] = $n;
-			$config['height'] = (($n * $height) / $width);
-			$this->image_lib->initialize($config);
-			if ( ! $this->image_lib->resize())
-			{
-				$error[] = $this->image_lib->display_errors('', '');
-			}
-			else
-			{
-				$name = $upload_data['file_name'];
-			}
-		}
-		else
-		{
-			$name = $upload_data['file_name'];
-		}
-		if (empty($error))
-		{
-			return $name;
-		}
-		else
-		{
-			return $error;
-		}
 	}
 
 }
