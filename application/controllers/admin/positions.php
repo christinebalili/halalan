@@ -102,14 +102,8 @@ class Positions extends MY_Controller {
 			}
 			$this->session->set_userdata('position', $data['position']); // used in callback rules
 		}
-		$this->form_validation->set_rules('election_id', e('admin_position_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('position', e('admin_position_position'), 'required|callback__rule_is_existing[positions.position,election_id]|callback__rule_dependencies');
-		$this->form_validation->set_rules('description', e('admin_position_description'));
-		$this->form_validation->set_rules('maximum', e('admin_position_maximum'), 'required|is_natural_no_zero');
-		$this->form_validation->set_rules('ordinality', e('admin_position_ordinality'), 'required|is_natural_no_zero');
-		$this->form_validation->set_rules('abstain', e('admin_position_abstain'));
-		$this->form_validation->set_rules('unit', e('admin_position_unit'));
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_position'))
 		{
 			$position['election_id'] = $this->input->post('election_id', TRUE);
 			$position['position'] = $this->input->post('position', TRUE);

@@ -119,9 +119,8 @@ class Elections extends MY_Controller {
 			}
 			$this->session->set_userdata('election', $data['election']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('election', e('admin_election_election'), 'required|callback__rule_is_existing[elections.election]');
-		$this->form_validation->set_rules('description', e('admin_election_description'));
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_election'))
 		{
 			$election['election'] = $this->input->post('election', TRUE);
 			$election['description'] = $this->input->post('description', TRUE);

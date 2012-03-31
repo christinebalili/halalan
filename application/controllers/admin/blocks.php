@@ -130,9 +130,8 @@ class Blocks extends MY_Controller {
 			}
 			$this->session->set_userdata('block', $data['block']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('block', e('admin_block_block'), 'required|callback__rule_is_existing[blocks.block]|callback__rule_dependencies');
-		$this->form_validation->set_rules('chosen_elections', e('admin_block_chosen_elections'), 'required|callback__rule_running_election');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_block'))
 		{
 			$block['block'] = $this->input->post('block', TRUE);
 			// chosen elections are also in the ids of the positions

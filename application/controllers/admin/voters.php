@@ -118,18 +118,8 @@ class Voters extends MY_Controller {
 			}
 			$this->session->set_userdata('voter', $data['voter']); // so callback rules know that the action is edit
 		}
-		if ($this->config->item('halalan_password_pin_generation') == 'email')
-		{
-			$this->form_validation->set_rules('username', e('admin_voter_email'), 'required|valid_email|callback__rule_is_existing[voters.username]|callback__rule_dependencies');
-		}
-		else
-		{
-			$this->form_validation->set_rules('username', e('admin_voter_username'), 'required|callback__rule_is_existing[voters.username]|callback__rule_dependencies');
-		}
-		$this->form_validation->set_rules('first_name', e('admin_voter_first_name'), 'required');
-		$this->form_validation->set_rules('last_name', e('admin_voter_last_name'), 'required');
-		$this->form_validation->set_rules('block_id', e('admin_voter_block'), 'required|callback__rule_running_election');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_voter_' . $this->config->item('halalan_password_pin_generation')))
 		{
 			$password = '';
 			$pin = '';
@@ -201,9 +191,8 @@ class Voters extends MY_Controller {
 
 	public function import()
 	{
-		$this->form_validation->set_rules('block_id', e('admin_import_block'), 'required');
-		$this->form_validation->set_rules('csv', e('admin_import_csv'), 'callback__rule_upload_csv');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('import'))
 		{
 			$voter['password'] = '';
 			$voter['block_id'] = $this->input->post('block_id', TRUE);
@@ -275,8 +264,8 @@ class Voters extends MY_Controller {
 
 	public function export()
 	{
-		$this->form_validation->set_rules('block_id', e('admin_export_block'), 'required');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('export'))
 		{
 			$header = '';
 			if ($this->config->item('halalan_password_pin_generation') == 'web')

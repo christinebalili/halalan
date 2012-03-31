@@ -106,12 +106,8 @@ class Parties extends MY_Controller {
 			}
 			$this->session->set_userdata('party', $data['party']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('election_id', e('admin_party_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('party', e('admin_party_party'), 'required|callback__rule_is_existing[parties.party,election_id]|callback__rule_dependencies');
-		$this->form_validation->set_rules('alias', e('admin_party_alias'));
-		$this->form_validation->set_rules('description', e('admin_party_description'));
-		$this->form_validation->set_rules('logo', e('admin_party_logo'), 'callback__rule_upload_image');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_party'))
 		{
 			$party['election_id'] = $this->input->post('election_id', TRUE);
 			$party['party'] = $this->input->post('party', TRUE);

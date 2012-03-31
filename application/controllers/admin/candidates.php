@@ -146,15 +146,8 @@ class Candidates extends MY_Controller {
 			}
 			$this->session->set_userdata('candidate', $data['candidate']); // so callback rules know that the action is edit
 		}
-		$this->form_validation->set_rules('first_name', e('admin_candidate_first_name'), 'required|callback__rule_dependencies');
-		$this->form_validation->set_rules('last_name', e('admin_candidate_last_name'), 'required|callback__rule_is_existing[candidates.last_name,first_name,alias,election_id]');
-		$this->form_validation->set_rules('alias', e('admin_candidate_alias'));
-		$this->form_validation->set_rules('description', e('admin_candidate_description'));
-		$this->form_validation->set_rules('election_id', e('admin_candidate_election'), 'required|callback__rule_running_election');
-		$this->form_validation->set_rules('position_id', e('admin_candidate_position'), 'required');
-		$this->form_validation->set_rules('party_id', e('admin_candidate_party'));
-		$this->form_validation->set_rules('picture', e('admin_candidate_picture'), 'callback__rule_upload_image');
-		if ($this->form_validation->run())
+		// validation rules are in the config file
+		if ($this->form_validation->run('_candidate'))
 		{
 			$candidate['first_name'] = $this->input->post('first_name', TRUE);
 			$candidate['last_name'] = $this->input->post('last_name', TRUE);
