@@ -134,8 +134,8 @@ class Voters extends MY_Controller {
 			$password = '';
 			$pin = '';
 			$voter['username'] = $this->input->post('username', TRUE);
-			$voter['last_name'] = $this->input->post('last_name', TRUE);
 			$voter['first_name'] = $this->input->post('first_name', TRUE);
+			$voter['last_name'] = $this->input->post('last_name', TRUE);
 			$voter['block_id'] = $this->input->post('block_id', TRUE);
 			if ($case == 'add' || $this->input->post('password'))
 			{

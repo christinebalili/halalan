@@ -16,18 +16,18 @@
 	</tr>
 	<tr>
 		<td class="w20" align="right">
-			<?php echo form_label(e('admin_voter_last_name') . ':', 'last_name'); ?>
-		</td>
-		<td>
-			<?php echo form_input('last_name', set_value('last_name', $voter['last_name']), 'id="last_name" maxlength="31" class="text"'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
 			<?php echo form_label(e('admin_voter_first_name') . ':', 'first_name'); ?>
 		</td>
 		<td>
 			<?php echo form_input('first_name', set_value('first_name', $voter['first_name']), 'id="first_name" maxlength="63" class="text"'); ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="w20" align="right">
+			<?php echo form_label(e('admin_voter_last_name') . ':', 'last_name'); ?>
+		</td>
+		<td>
+			<?php echo form_input('last_name', set_value('last_name', $voter['last_name']), 'id="last_name" maxlength="63" class="text"'); ?>
 		</td>
 	</tr>
 	<tr>
