@@ -1,8 +1,8 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 // don't change if you already entered some data
 $config['halalan_pin'] = TRUE;
-$config['halalan_password_pin_generation'] = "web";
+$config['halalan_password_pin_generation'] = "email";
 $config['halalan_password_pin_characters'] = "alnum";
 $config['halalan_password_length'] = 4;
 $config['halalan_pin_length'] = 4;

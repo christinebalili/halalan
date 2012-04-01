@@ -1,14 +1,14 @@
-<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 4.3.2 or newer
+ * An open source application development framework for PHP 5.1.6 or newer
  *
  * @package		CodeIgniter
- * @author		Rick Ellis
- * @copyright	Copyright (c) 2006, EllisLab, Inc.
- * @license		http://www.codeignitor.com/user_guide/license.html
- * @link		http://www.codeigniter.com
+ * @author		ExpressionEngine Dev Team
+ * @copyright	Copyright (c) 2008 - 2011, EllisLab, Inc.
+ * @license		http://codeigniter.com/user_guide/license.html
+ * @link		http://codeigniter.com
  * @since		Version 1.0
  * @filesource
  */
@@ -16,7 +16,7 @@
 // ------------------------------------------------------------------------
 
 /**
- * CodeIgniter Halalan Helpers
+ * CodeIgniter Halalan Helper
  *
  * @package		CodeIgniter
  * @subpackage	Helpers
@@ -53,13 +53,13 @@ function display_messages($validation, $custom)
 	$return = '';
 	// negatives take precedent
 	// but we are sure that only one of the params has values
-	if (!empty($validation))
+	if ( ! empty($validation))
 	{
 		$return .= '<div class="negative"><ul>';
 		$return .= $validation;
 		$return .= '</ul></div>';
 	}
-	else if (!empty($custom))
+	else if ( ! empty($custom))
 	{
 		if ($custom[0] == 'positive')
 		{
@@ -76,4 +76,6 @@ function display_messages($validation, $custom)
 	return $return;
 }
 
-?>
+
+/* End of file halalan_helper.php */
+/* Location: ./application/heleprs/halalan_helper.php */
