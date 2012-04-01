@@ -32,6 +32,10 @@ class Candidates extends MY_Controller {
 		{
 			$election_id = $this->input->cookie('selected_election');
 		}
+		if ($this->input->cookie('selected_position'))
+		{
+			$position_id = $this->input->cookie('selected_position');
+		}
 		$positions = $this->Position->select_all_by_election_id($election_id);
 		foreach ($positions as $key => $value)
 		{
@@ -122,6 +126,15 @@ class Candidates extends MY_Controller {
 		if ($case == 'add')
 		{
 			$data['candidate'] = array('first_name' => '', 'last_name' => '', 'alias' => '', 'description' => '', 'election_id' => '', 'position_id' => '', 'party_id' => '');
+			if ($this->input->cookie('selected_election'))
+			{
+				$data['candidate']['election_id'] = $this->input->cookie('selected_election');
+				$election_id = $this->input->cookie('selected_election');
+			}
+			if ($this->input->cookie('selected_position'))
+			{
+				$data['candidate']['position_id'] = $this->input->cookie('selected_position');
+			}
 			$this->session->unset_userdata('candidate'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')
@@ -149,13 +162,13 @@ class Candidates extends MY_Controller {
 		// validation rules are in the config file
 		if ($this->form_validation->run('_candidate'))
 		{
+			$candidate['election_id'] = $this->input->post('election_id', TRUE);
+			$candidate['position_id'] = $this->input->post('position_id', TRUE);
+			$candidate['party_id'] = $this->input->post('party_id', TRUE);
 			$candidate['first_name'] = $this->input->post('first_name', TRUE);
 			$candidate['last_name'] = $this->input->post('last_name', TRUE);
 			$candidate['alias'] = $this->input->post('alias', TRUE);
 			$candidate['description'] = $this->input->post('description', TRUE);
-			$candidate['election_id'] = $this->input->post('election_id', TRUE);
-			$candidate['position_id'] = $this->input->post('position_id', TRUE);
-			$candidate['party_id'] = $this->input->post('party_id', TRUE);
 			if ($picture = $this->session->userdata('image_upload_data'))
 			{
 				$candidate['picture'] = $picture;
@@ -187,13 +200,8 @@ class Candidates extends MY_Controller {
 			$election_id = $this->input->post('election_id');
 		}
 		$data['elections'] = $this->Election->for_dropdown();
-		$data['positions'] = array();
-		$data['parties'] = array();
-		if ($election_id > 0)
-		{
-			$data['positions'] = $this->Position->select_all_by_election_id($election_id);
-			$data['parties'] = $this->Party->select_all_by_election_id($election_id);
-		}
+		$data['positions'] = $this->Position->for_dropdown($election_id);
+		$data['parties'] = $this->Party->for_dropdown($election_id);
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_candidate_title');
 		$admin['body'] = $this->load->view('admin/candidate', $data, TRUE);

@@ -86,6 +86,10 @@ class Parties extends MY_Controller {
 		if ($case == 'add')
 		{
 			$data['party'] = array('election_id' => '', 'party' => '', 'alias' => '', 'description' => '');
+			if ($this->input->cookie('selected_election'))
+			{
+				$data['party']['election_id'] = $this->input->cookie('selected_election');
+			}
 			$this->session->unset_userdata('party'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')

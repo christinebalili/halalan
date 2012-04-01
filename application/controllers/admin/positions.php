@@ -82,6 +82,10 @@ class Positions extends MY_Controller {
 		if ($case == 'add')
 		{
 			$data['position'] = array('election_id' => '', 'position' => '', 'description' => '', 'maximum' => '', 'ordinality' => '', 'abstain' => '1', 'unit' => '0');
+			if ($this->input->cookie('selected_election'))
+			{
+				$data['position']['election_id'] = $this->input->cookie('selected_election');
+			}
 			$this->session->unset_userdata('position'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')

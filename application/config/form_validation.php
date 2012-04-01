@@ -79,6 +79,21 @@ $config = array(
 		),
 		'_candidate' => array(
 			array(
+				'field' => 'election_id',
+				'label' => e('admin_candidate_election'),
+				'rules' => 'required|callback__rule_running_election'
+			),
+			array(
+				'field' => 'position_id',
+				'label' => e('admin_candidate_position'),
+				'rules' => 'required'
+			),
+			array(
+				'field' => 'party_id',
+				'label' => e('admin_candidate_party'),
+				'rules' => ''
+			),
+			array(
 				'field' => 'first_name',
 				'label' => e('admin_candidate_first_name'),
 				'rules' => 'required|max_length[63]|callback__rule_dependencies'
@@ -96,21 +111,6 @@ $config = array(
 			array(
 				'field' => 'description',
 				'label' => e('admin_candidate_description'),
-				'rules' => ''
-			),
-			array(
-				'field' => 'election_id',
-				'label' => e('admin_candidate_election'),
-				'rules' => 'required|callback__rule_running_election'
-			),
-			array(
-				'field' => 'position_id',
-				'label' => e('admin_candidate_position'),
-				'rules' => 'required'
-			),
-			array(
-				'field' => 'party_id',
-				'label' => e('admin_candidate_party'),
 				'rules' => ''
 			),
 			array(

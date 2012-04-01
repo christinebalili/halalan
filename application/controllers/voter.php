@@ -297,6 +297,7 @@ class Voter extends CI_Controller {
 		// delete cookies
 		$this->input->set_cookie('halalan_abstain'); // used in abstain alert
 		$this->input->set_cookie('selected_election'); // used in remembering selected election
+		$this->input->set_cookie('selected_position'); // used in remembering selected position
 		$this->session->sess_destroy();
 		$voter['title'] = e('voter_logout_title');
 		$voter['meta'] = '<meta http-equiv="refresh" content="5;URL=' . base_url() . '" />';

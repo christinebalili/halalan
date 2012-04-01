@@ -8,6 +8,30 @@
 <table cellpadding="0" cellspacing="0" border="0" class="form_table" width="100%">
 	<tr>
 		<td class="w20" align="right">
+			<?php echo form_label(e('admin_candidate_election') . ':' , 'election_id'); ?>
+		</td>
+		<td>
+			<?php echo form_dropdown('election_id', array('' => 'Select Election') + $elections, set_value('election_id', $candidate['election_id']), 'id="election_id" class="fillPositionsAndParties"'); ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="w20" align="right">
+			<?php echo form_label(e('admin_candidate_position') . ':' , 'position_id'); ?>
+		</td>
+		<td>
+			<?php echo form_dropdown('position_id', array('' => 'Select Position') + $positions, set_value('position_id', $candidate['position_id']), 'id="position_id"'); ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="w20" align="right">
+			<?php echo form_label(e('admin_candidate_party') . ':' , 'party_id'); ?>
+		</td>
+		<td>
+			<?php echo form_dropdown('party_id', array('' => 'Select Party') + $parties, set_value('party_id', $candidate['party_id']), 'id="party_id"'); ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="w20" align="right">
 			<?php echo form_label(e('admin_candidate_first_name') . ':', 'first_name'); ?>
 		</td>
 		<td>
@@ -36,50 +60,6 @@
 		</td>
 		<td>
 			<?php echo form_textarea('description', set_value('description', $candidate['description']), 'id="description"'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
-			<?php echo form_label(e('admin_candidate_election') . ':' , 'election_id'); ?>
-		</td>
-		<td>
-			<?php echo form_dropdown('election_id', array('' => 'Select Election') + $elections, set_value('election_id', $candidate['election_id']), 'id="election_id" class="fillPositionsAndParties"'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
-			<?php echo form_label(e('admin_candidate_position') . ':' , 'position_id'); ?>
-		</td>
-		<td>
-			<!-- form_dropdown and set_select don't work together :( -->
-			<select name="position_id" id="position_id">
-				<option value="">Select Position</option>
-				<?php foreach ($positions as $position): ?>
-				<?php
-					echo '<option value="' . $position['id'] . '"';
-					echo set_select('position_id', $position['id'], $candidate['position_id'] == $position['id'] ? TRUE : FALSE);
-					echo '>' . $position['position'] . '</option>';
-				?>
-				<?php endforeach; ?>
-			</select>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
-			<?php echo form_label(e('admin_candidate_party') . ':' , 'party_id'); ?>
-		</td>
-		<td>
-			<!-- form_dropdown and set_select don't work together :( -->
-			<select name="party_id" id="party_id">
-				<option value="">Select Party</option>
-				<?php foreach ($parties as $party): ?>
-				<?php
-					echo '<option value="' . $party['id'] . '"';
-					echo set_select('party_id', $party['id'], $candidate['party_id'] == $party['id'] ? TRUE : FALSE);
-					echo '>' . $party['party'] . '</option>';
-				?>
-				<?php endforeach; ?>
-			</select>
 		</td>
 	</tr>
 	<tr>

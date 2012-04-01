@@ -190,6 +190,7 @@ function changeElections() {
 	url += window.location.href.substring(url.length).split('/')[0];
 	url += '/index/' + $(this).val();
 	$.cookie('selected_election', $(this).val(), {path: '/'});
+	$.cookie('selected_position', '', {path: '/'});
 	window.location.href = url;
 }
 
@@ -199,6 +200,7 @@ function changePositions() {
 		url += '/';
 	}
 	url += 'admin/candidates/index/' + $('select.changeElections').val() + '/' + $(this).val();
+	$.cookie('selected_position', $(this).val(), {path: '/'});
 	window.location.href = url;
 }
 

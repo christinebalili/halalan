@@ -79,6 +79,21 @@ class Party extends CI_Model {
 		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
+	public function for_dropdown($election_id)
+	{
+		$this->db->from('parties');
+		$this->db->where('election_id', $election_id);
+		$this->db->order_by('party', 'ASC');
+		$query = $this->db->get();
+		$tmp = $query->result_array();
+		$parties = array();
+		foreach ($tmp as $t)
+		{
+			$parties[$t['id']] = $t['party'];
+		}
+		return $parties;
+	}
+
 }
 
 /* End of file party.php */
