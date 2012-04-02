@@ -284,21 +284,6 @@ class Voters extends MY_Controller {
 				$header = 'Email';
 			}
 			$header .= ',Last Name,First Name';
-			if ($this->input->post('password'))
-			{
-				$header .= ',Password';
-			}
-			if ($this->config->item('halalan_pin'))
-			{
-				if ($this->input->post('pin'))
-				{
-					$header .= ',PIN';
-				}
-			}
-			if ($this->input->post('votes'))
-			{
-				$header .= ',Votes';
-			}
 			if ($this->input->post('status'))
 			{
 				$header .= ',Voted';
@@ -308,33 +293,6 @@ class Voters extends MY_Controller {
 			foreach ($voters as $voter)
 			{
 				$row = $voter['username'] . ',' . $voter['last_name'] . ',' . $voter['first_name'];
-				if ($this->input->post('password'))
-				{
-					$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
-					$boter['password'] = sha1($password);
-					$row .= ',' . $password;
-					$this->Boter->update($boter, $voter['id']);
-				}
-				if ($this->config->item('halalan_pin'))
-				{
-					if ($this->input->post('pin'))
-					{
-						$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
-						$boter['pin'] = sha1($pin);
-						$row .= ',' . $pin;
-						$this->Boter->update($boter, $voter['id']);
-					}
-				}
-				if ($this->input->post('votes'))
-				{
-					$votes = $this->Vote->select_all_by_voter_id($voter['id']);
-					$tmp = array();
-					foreach ($votes as $vote)
-					{
-						$tmp[] = $vote['first_name'] . ' ' . $vote['last_name'];
-					}
-					$row .= ',' . implode(' | ', $tmp);
-				}
 				if ($this->input->post('status'))
 				{
 					$voted = $this->Voted->select_all_by_voter_id($voter['id']);
@@ -351,7 +309,7 @@ class Voters extends MY_Controller {
 			$data = implode("\r\n", $data);
 			force_download('voters.csv', $data);
 		}
-		$data['blocks'] = $this->Block->select_all();
+		$data['blocks'] = $this->Block->for_dropdown();
 		$admin['title'] = e('admin_export_title');
 		$admin['body'] = $this->load->view('admin/export', $data, TRUE);
 		$this->load->view('admin', $admin);
