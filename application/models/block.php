@@ -120,6 +120,20 @@ class Block extends CI_Model {
 		return $this->db->count_all_results() > 0 ? TRUE : FALSE;
 	}
 
+	public function for_dropdown()
+	{
+		$this->db->from('blocks');
+		$this->db->order_by('block', 'ASC');
+		$query = $this->db->get();
+		$tmp = $query->result_array();
+		$blocks = array();
+		foreach ($tmp as $t)
+		{
+			$blocks[$t['id']] = $t['block'];
+		}
+		return $blocks;
+	}
+
 }
 
 /* End of file block.php */

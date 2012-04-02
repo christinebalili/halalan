@@ -76,9 +76,10 @@ class Boter extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function select_all_for_pagination($limit, $offset)
+	public function select_all_by_block_id_for_pagination($block_id, $limit, $offset)
 	{
 		$this->db->from('voters');
+		$this->db->where('block_id', $block_id);
 		$this->db->order_by('last_name', 'ASC');
 		$this->db->order_by('first_name', 'ASC');
 		$this->db->limit($limit, $offset);

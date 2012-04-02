@@ -26,9 +26,14 @@ class Voters extends MY_Controller {
 		$this->set_module('voter');
 	}
 	
-	public function index($offset = null)
+	public function index($offset = 0)
 	{
-		$voters = $this->Boter->select_all();
+		$block_id = 0;
+		if ($this->input->cookie('selected_block'))
+		{
+			$block_id = $this->input->cookie('selected_block');
+		}
+		$voters = $this->Boter->select_all_by_block_id($block_id);
 		$config['base_url'] = site_url('admin/voters/index');
 		$config['total_rows'] = count($voters);
 		$config['per_page'] = HALALAN_PER_PAGE;
@@ -40,15 +45,13 @@ class Voters extends MY_Controller {
 		$config['next_link'] = img('public/images/go-next.png');
 		$this->pagination->initialize($config); 
 		$data['links'] = $this->pagination->create_links();
-		if ($offset == null)
-		{
-			$offset = 0;
-		}
 		$limit = $config['per_page'];
 		$data['offset'] = $offset;
 		$data['limit'] = $limit;
 		$data['total_rows'] = $config['total_rows'];
-		$data['voters'] = $this->Boter->select_all_for_pagination($limit, $offset);
+		$data['voters'] = $this->Boter->select_all_by_block_id_for_pagination($block_id, $limit, $offset);
+		$data['block_id'] = $block_id;
+		$data['blocks'] = $this->Block->for_dropdown();
 		$admin['title'] = e('admin_voters_title');
 		$admin['body'] = $this->load->view('admin/voters', $data, TRUE);
 		$this->load->view('admin', $admin);
@@ -98,6 +101,10 @@ class Voters extends MY_Controller {
 		if ($case == 'add')
 		{
 			$data['voter'] = array('username' => '', 'first_name' => '', 'last_name' => '', 'block_id' => '');
+			if ($this->input->cookie('selected_block'))
+			{
+				$data['voter']['block_id'] = $this->input->cookie('selected_block');
+			}
 			$this->session->unset_userdata('voter'); // so callback rules know that the action is add
 		}
 		else if ($case == 'edit')

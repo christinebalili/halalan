@@ -190,6 +190,11 @@ function changePositions() {
 	window.location.href = CURRENT_URL;
 }
 
+function changeBlocks() {
+	$.cookie('selected_block', $(this).val(), {path: '/'});
+	window.location.href = CURRENT_URL;
+}
+
 /* DOM is ready */
 $(document).ready(function () {
 	var menu_map = {};
@@ -210,6 +215,7 @@ $(document).ready(function () {
 	$('form.selectChosen').submit(selectChosen);
 	$('select.changeElections').change(changeElections);
 	$('select.changePositions').change(changePositions);
+	$('select.changeBlocks').change(changeBlocks);
 	$('select.fillPositionsAndParties').change(fillPositionsAndParties);
 	
 	/* Code that aren't bound to events */

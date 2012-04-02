@@ -3,7 +3,11 @@
 	<h2><?php echo e('admin_voters_label'); ?></h2>
 </div>
 <div class="content_right">
-	<p class="align_right"><?php echo anchor('admin/voters/add', e('admin_voters_add')); ?></p>
+	<p class="align_right">
+		<?php echo anchor('admin/voters/add', e('admin_voters_add')); ?>
+		| View:
+		<?php echo form_dropdown('block_id', array('' => 'Choose Block') + $blocks, $block_id, 'class="changeBlocks" style="width: 130px;"'); ?>
+	</p>
 </div>
 <div class="clear"></div>
 <table cellpadding="0" cellspacing="0" class="table">
