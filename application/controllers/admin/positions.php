@@ -26,8 +26,9 @@ class Positions extends MY_Controller {
 		$this->set_module('position');
 	}
 	
-	public function index($election_id = 0)
+	public function index()
 	{
+		$election_id = 0;
 		if ($this->input->cookie('selected_election'))
 		{
 			$election_id = $this->input->cookie('selected_election');
