@@ -75,6 +75,7 @@ class Gate extends CI_Controller {
 					$this->session->set_userdata('username', $voter['username']);
 					$this->session->set_userdata('first_name', $voter['first_name']);
 					$this->session->set_userdata('last_name', $voter['last_name']);
+					$this->session->set_userdata('block_id', $voter['block_id']);
 					redirect('voter/vote');
 				}
 			}
@@ -136,10 +137,10 @@ class Gate extends CI_Controller {
 		{
 			$gate = 'admin';
 		}
-		else if($voter = $this->session->userdata('voter')) // TODO: Fix this
+		else if ($this->session->userdata('type') == 'voter')
 		{
 			// voter has not yet voted
-			$this->Boter->update(array('logout' => date("Y-m-d H:i:s")), $voter['id']);
+			$this->Boter->update(array('logout' => date("Y-m-d H:i:s")), $this->session->userdata('id'));
 			$gate = 'voter';
 		}
 		else
