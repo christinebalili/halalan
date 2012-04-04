@@ -55,7 +55,7 @@
 						<td class="w60">
 							<?php echo $name; ?>
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w30">
 						<?php else: ?>
 							<td class="w35">
@@ -68,7 +68,7 @@
 							<?php endif; ?>
 						<?php endif; ?>
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w5">
 								<?php echo img(array('src' => 'public/images/info.png', 'alt' => 'info', 'class' => 'pointer', 'title' => 'More info')); ?>
 							</td>
@@ -76,7 +76,7 @@
 					</tr>
 					<tr>
 						<td colspan="4">
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<div style="display:none;" class="details">
 							<?php if ( ! empty($candidate['picture'])): ?>
 								<div style="float:left;padding-right:5px;">
@@ -128,7 +128,7 @@
 						<td class="w60">
 							ABSTAIN
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w30"></td>
 							<td class="w5"></td>
 						<?php else: ?>
@@ -152,18 +152,18 @@
 	<?php endif; ?>
 <?php endforeach; ?>
 
-<?php if ($settings['captcha'] || $settings['pin']): ?>
+<?php if ($this->config->item('halalan_captcha') OR $this->config->item('halalan_pin')): ?>
 <div class="notes">
 <h2><?php echo e('voter_confirm_vote_validation_label'); ?></h2>
 <table cellpadding="0" cellspacing="0" border="0" class="form_table">
 	<tr>
-		<?php if ($settings['captcha']): ?>
+		<?php if ($this->config->item('halalan_captcha')): ?>
 		<td><?php echo $captcha['image']; ?></td>
-		<td><label for="captcha"><?php echo e('voter_confirm_vote_captcha_label'); ?><br /><?php echo form_input(array('id' => 'captcha', 'name' => 'captcha', 'size' => 20, 'maxlength' => $settings['captcha_length'])); ?></label></td>
+		<td><label for="captcha"><?php echo e('voter_confirm_vote_captcha_label'); ?><br /><?php echo form_input(array('id' => 'captcha', 'name' => 'captcha', 'size' => 20, 'maxlength' => $this->config->item('halalan_captcha_length'))); ?></label></td>
 		<?php endif ;?>
-		<?php if ($settings['pin']): ?>
+		<?php if ($this->config->item('halalan_pin')): ?>
 		<td>&nbsp;</td>
-		<td><label for="pin"><?php echo e('voter_confirm_vote_pin_label'); ?><br /><?php echo form_input(array('id' => 'pin', 'name' => 'pin', 'size' => 20, 'maxlength' => $settings['pin_length'])); ?></label></td>
+		<td><label for="pin"><?php echo e('voter_confirm_vote_pin_label'); ?><br /><?php echo form_input(array('id' => 'pin', 'name' => 'pin', 'size' => 20, 'maxlength' => $this->config->item('halalan_pin_length'))); ?></label></td>
 		<?php endif; ?>
 	</tr>
 </table>

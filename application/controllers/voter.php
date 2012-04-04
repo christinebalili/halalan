@@ -18,35 +18,24 @@
  * along with Halalan.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Voter extends CI_Controller {
-
-	public $voter;
-	public $settings;
+class Voter extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->voter = $this->session->userdata('voter');
-		if ( ! $this->voter)
-		{
-			$error[] = e('common_unauthorized');
-			$this->session->set_flashdata('error', $error);
-			redirect('gate/voter');
-		}
-		$this->settings = $this->config->item('halalan');
 	}
 
 	public function index()
 	{
 		$this->_no_cache();
 		$election_ids = array();
-		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->voter['block_id']);
+		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->session->userdata('block_id'));
 		foreach ($chosen as $c)
 		{
 			$election_ids[] = $c['election_id'];
 		}
 		$voted = array();
-		$tmp = $this->Voted->select_all_by_voter_id($this->voter['id']);
+		$tmp = $this->Voted->select_all_by_voter_id($this->session->userdata('id'));
 		foreach ($tmp as $t)
 		{
 			$voted[] = $t['election_id'];
@@ -55,7 +44,6 @@ class Voter extends CI_Controller {
 		$data['elections'] = $this->Election->select_all();
 		$data['voted'] = $voted;
 		$voter['index'] = TRUE; // flag to determine what to show in the main voter template
-		$voter['username'] = $this->voter['username'];
 		$voter['title'] = e('voter_index_title');
 		$voter['body'] = $this->load->view('voter/index', $data, TRUE);
 		$this->load->view('voter', $voter);
@@ -66,7 +54,7 @@ class Voter extends CI_Controller {
 		$this->_no_cache();
 		$rules = array('position_count' => 0, 'candidate_count' => array()); // used in checking in do_vote
 		$array = array();
-		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->voter['block_id']);
+		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->session->userdata('block_id'));
 		foreach ($chosen as $c)
 		{
 			$array[$c['election_id']][] = $c['position_id'];
@@ -102,8 +90,6 @@ class Voter extends CI_Controller {
 		{
 			$data['votes'] = $votes;
 		}
-		$data['settings'] = $this->settings;
-		$voter['username'] = $this->voter['username'];
 		$voter['title'] = e('voter_vote_title');
 		$voter['body'] = $this->load->view('voter/vote', $data, TRUE);
 		$this->load->view('voter', $voter);
@@ -177,7 +163,7 @@ class Voter extends CI_Controller {
 		}
 		$data['votes'] = $votes;
 		$array = array();
-		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->voter['block_id']);
+		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->session->userdata('block_id'));
 		foreach ($chosen as $c)
 		{
 			$array[$c['election_id']][] = $c['position_id'];
@@ -203,16 +189,16 @@ class Voter extends CI_Controller {
 			$elections[$key1]['positions'] = $positions;
 		}
 		$data['elections'] = $elections;
-		if ($this->settings['captcha'])
+		if ($this->config->item('halalan_captcha'))
 		{
-			$this->load->plugin('captcha');
-			$vals = array('img_path' => './public/captcha/', 'img_url' => base_url() . 'public/captcha/', 'font_path' => './public/fonts/Vera.ttf', 'img_width' => 150, 'img_height' => 60, 'word_length' => $this->settings['captcha_length']);
+			$this->load->helper('captcha');
+			$word = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_captcha_length'));
+			$vals = array('word' => $word, 'img_path' => './public/captcha/', 'img_url' => base_url('public/captcha') . '/', 'font_path' => './public/fonts/Vera.ttf', 'img_width' => 150, 'img_height' => 60);
 			$captcha = create_captcha($vals);
+			$query = $this->db->insert_string('captchas', array('captcha_time' => $captcha['time'], 'ip_address' => $this->input->ip_address(), 'word' => $captcha['word']));
+			$this->db->query($query);
 			$data['captcha'] = $captcha;
-			$this->session->set_userdata('word', $captcha['word']);
 		}
-		$data['settings'] = $this->settings;
-		$voter['username'] = $this->voter['username'];
 		$voter['title'] = e('voter_confirm_vote_title');
 		$voter['body'] = $this->load->view('voter/confirm_vote', $data, TRUE);
 		$this->load->view('voter', $voter);
@@ -221,7 +207,7 @@ class Voter extends CI_Controller {
 	public function do_verify()
 	{
 		$error = array();
-		if ($this->settings['captcha'])
+		if ($this->config->item('halalan_captcha'))
 		{
 			$captcha = $this->input->post('captcha');
 			if (empty($captcha))
@@ -230,12 +216,21 @@ class Voter extends CI_Controller {
 			}
 			else
 			{
-				$word = $this->session->userdata('word');
-				if ($captcha != $word)
+				// First, delete old captchas
+				$expiration = time() - 7200; // Two hour limit
+				$this->db->query('DELETE FROM captchas WHERE captcha_time < ' . $expiration);
+				// Then see if a captcha exists:
+				$sql = 'SELECT COUNT(*) AS count FROM captchas WHERE word = ? AND ip_address = ? AND captcha_time > ?';
+				$binds = array($captcha, $this->input->ip_address(), $expiration);
+				$query = $this->db->query($sql, $binds);
+				$row = $query->row();
+				if ($row->count == 0)
+				{
 					$error[] = e('voter_confirm_vote_not_captcha');
+				}
 			}
 		}
-		if ($this->settings['pin'])
+		if ($this->config->item('halalan_pin'))
 		{
 			$pin = $this->input->post('pin');
 			if (empty($pin))
@@ -244,18 +239,21 @@ class Voter extends CI_Controller {
 			}
 			else
 			{
-				if (sha1($pin) != $this->voter['pin'])
+				$voter = $this->Boter->select($this->session->userdata('id'));
+				if (sha1($pin) != $voter['pin'])
+				{
 					$error[] = e('voter_confirm_vote_not_pin');
+				}
 			}
 		}
 		if (empty($error))
 		{
-			$voter_id = $this->voter['id'];
+			$voter_id = $this->session->userdata('id');
 			$timestamp = date("Y-m-d H:i:s");
 			$votes = $this->session->userdata('votes');
-			foreach ($votes as $election_id=>$positions)
+			foreach ($votes as $election_id => $positions)
 			{
-				foreach ($positions as $position_id=>$candidate_ids)
+				foreach ($positions as $position_id => $candidate_ids)
 				{
 					$abstain = FALSE;
 					foreach ($candidate_ids as $candidate_id)
@@ -277,7 +275,7 @@ class Voter extends CI_Controller {
 				$this->Voted->insert(compact('election_id', 'voter_id', 'timestamp'));
 			}
 			$this->session->unset_userdata('votes');
-			if ($this->settings['generate_image_trail'])
+			if ($this->config->item('halalan_generate_image_trail'))
 			{
 				$this->_generate_image_trail($votes);
 			}
@@ -293,7 +291,7 @@ class Voter extends CI_Controller {
 	public function logout()
 	{
 		$this->_no_cache();
-		$this->Boter->update(array('logout' => date('Y-m-d H:i:s')), $this->voter['id']);
+		$this->Boter->update(array('logout' => date('Y-m-d H:i:s')), $this->session->userdata('id'));
 		// delete cookies
 		$this->input->set_cookie('halalan_abstain'); // used in abstain alert
 		$this->input->set_cookie('selected_election'); // used in remembering selected election
@@ -316,7 +314,7 @@ class Voter extends CI_Controller {
 		}
 		// get all elections and positions assigned to the voter
 		$array = array();
-		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->voter['block_id']);
+		$chosen = $this->Block_Election_Position->select_all_by_block_id($this->session->userdata('block_id'));
 		foreach ($chosen as $c)
 		{
 			$array[$c['election_id']][] = $c['position_id'];
@@ -328,7 +326,7 @@ class Voter extends CI_Controller {
 		}
 		// get all elections voted in by the voter
 		$voted = array();
-		$tmp = $this->Voted->select_all_by_voter_id($this->voter['id']);
+		$tmp = $this->Voted->select_all_by_voter_id($this->session->userdata('id'));
 		foreach ($tmp as $t)
 		{
 			$voted[] = $t['election_id'];
@@ -348,7 +346,7 @@ class Voter extends CI_Controller {
 		if (in_array($case, array('view', 'print')))
 		{
 			// get all voted candidate ids
-			$votes = $this->Vote->select_all_by_voter_id($this->voter['id']);
+			$votes = $this->Vote->select_all_by_voter_id($this->session->userdata('id'));
 			$candidate_ids = array();
 			foreach ($votes as $vote)
 			{
@@ -388,28 +386,25 @@ class Voter extends CI_Controller {
 		}
 		if ($case == 'view')
 		{
-			$data['settings'] = $this->settings;
 			$voter['view_votes'] = TRUE; // flag to determine what to show in the main voter template
-			$voter['username'] = $this->voter['username'];
 			$voter['title'] = e('voter_votes_title');
 			$voter['body'] = $this->load->view('voter/votes', $data, TRUE);
 			$this->load->view('voter', $voter);
 		}
 		else if ($case == 'print')
 		{
-			$data['voter'] = $this->voter;
 			$this->load->view('voter/print_votes', $data);
 		}
 		else if ($case == 'download')
 		{
-			if ( ! $this->settings['generate_image_trail'])
+			if ( ! $this->config->item('halalan_generate_image_trail'))
 			{
 				$this->session->set_flashdata('messages', array('negative', e('voter_votes_image_trail_disabled')));
 				redirect('voter/index');
 			}
-			$voted = $this->Voted->select($election_id, $this->voter['id']);
-			$path = $this->settings['image_trail_path'] . $election_id . '/';
-			$name = $election_id . '_' . $voted['image_trail_hash'] . '_' . $this->voter['id'] . '.png';
+			$voted = $this->Voted->select($election_id, $this->session->userdata('id'));
+			$path = $this->config->item('halalan_image_trail_path') . $election_id . '/';
+			$name = $election_id . '_' . $voted['image_trail_hash'] . '_' . $this->session->userdata('id') . '.png';
 			$contents = file_get_contents($path . $name);
 			if ($contents == FALSE)
 			{
@@ -543,7 +538,7 @@ class Voter extends CI_Controller {
 			}
 			imagettftext($im, 5, 0, 10, $img_height - 10, $text_color, $font, 'Generated on ' . date('Y-m-d H:i:s'));
 			imagerectangle($im, 0, 0, $img_width-1, $img_height-1, $border_color);
-			$path = $this->settings['image_trail_path'] . $election_id . '/';
+			$path = $this->config->item('halalan_image_trail_path') . $election_id . '/';
 			mkdir($path);
 			$name = $election_id . '_' . $this->voter['id'] . '.png';
 			imagepng($im, $path . $name);
@@ -558,75 +553,29 @@ class Voter extends CI_Controller {
 			$this->image_lib->watermark();
 			$hash = sha1_file($path . $name);
 			$voted['image_trail_hash'] = $hash;
-			$this->Voted->update($voted, $election_id, $this->voter['id']);
-			rename($path . $name, $path . $election_id . '_' . $hash . '_' . $this->voter['id'] . '.png');
+			$this->Voted->update($voted, $election_id, $this->session->userdata('id'));
+			rename($path . $name, $path . $election_id . '_' . $hash . '_' . $this->session->userdata('id') . '.png');
 		}
 	}
 
 	// get only running elections
 	public function _filter($elections)
 	{
-		$parents = array();
-		$children = array();
-		$running = array();
-		foreach ($elections as $election)
-		{
-			if ($election['parent_id'] == 0)
-			{
-				$parents[] = $election;
-			}
-			else
-			{
-				$children[] = $election;
-			}
-		}
-		foreach ($parents as $parent)
-		{
-			if ($parent['status'])
-			{
-				$running[$parent['id']]['parent'] = $parent;
-			}
-		}
-		foreach ($children as $child)
-		{
-			if ($child['status'])
-			{
-				$running[$child['parent_id']][] = $child;
-			}
-			else
-			{
-				// don't show the parent election if the child election is not running
-				unset($running[$child['parent_id']]);
-			}
-		}
-		// flatten the array and remove elections that have been voted in by the voter
-		// the format of $running is like that so we can put the children elections after their parents
-		$voted = $this->Voted->select_all_by_voter_id($this->voter['id']);
+		$voted = $this->Voted->select_all_by_voter_id($this->session->userdata('id'));
 		$election_ids = array();
 		foreach ($voted as $v)
 		{
 			$election_ids[] = $v['election_id'];
 		}
-		$tmp = array();
-		foreach ($running as $r)
+		$running = array();
+		foreach ($elections as $election)
 		{
-			if (isset($r['parent']))
+			if ($election['status'] && ! in_array($election['id'], $election_ids))
 			{
-				if ( ! in_array($r['parent']['id'], $election_ids))
-				{
-					$tmp[] = $r['parent'];
-				}
-				unset($r['parent']);
-			}
-			foreach ($r as $value)
-			{
-				if ( ! in_array($value['id'], $election_ids))
-				{
-					$tmp[] = $value;
-				}
+				$running[] = $election;
 			}
 		}
-		return $tmp;
+		return $running;
 	}
 
 	public function _no_cache()

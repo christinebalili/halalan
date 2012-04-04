@@ -39,7 +39,7 @@
 					<td class="w60">
 						<?php echo $name; ?>
 					</td>
-					<?php if ($settings['show_candidate_details']): ?>
+					<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 						<td class="w30">
 					<?php else: ?>
 						<td class="w35">
@@ -52,7 +52,7 @@
 						<?php endif; ?>
 					<?php endif; ?>
 					</td>
-					<?php if ($settings['show_candidate_details']): ?>
+					<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 						<td class="w5">
 							<?php echo img(array('src' => 'public/images/info.png', 'alt' => 'info', 'class' => 'pointer', 'title' => 'More info')); ?>
 						</td>
@@ -60,7 +60,7 @@
 				</tr>
 				<tr>
 					<td colspan="4">
-					<?php if ($settings['show_candidate_details']): ?>
+					<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 						<div style="display:none;" class="details">
 						<?php if ( ! empty($candidate['picture'])): ?>
 							<div style="float:left;padding-right:5px;">
@@ -98,7 +98,7 @@
 					<td class="w60">
 						ABSTAIN
 					</td>
-					<?php if ($settings['show_candidate_details']): ?>
+					<?php if ($this->config->item('show_candidate_details')): ?>
 						<td class="w30"></td>
 						<td class="w5"></td>
 					<?php else: ?>
@@ -123,7 +123,7 @@
 <div class="paging">
 	<input type="hidden" name="election_id" value="<?php echo $election['id']; ?>" id="election_id" />
 	<input type="button" class="printVotes" value="<?php echo e('voter_votes_print_button'); ?>" />
-	<?php if ($settings['generate_image_trail']): ?>
+	<?php if ($this->config->item('halalan_generate_image_trail')): ?>
 	<input type="button" class="downloadVotes" value="<?php echo e('voter_votes_download_button'); ?>" />
 	<?php endif; ?>
 </div>

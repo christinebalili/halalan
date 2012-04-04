@@ -51,7 +51,7 @@
 						<td class="w60">
 							<label for="<?php echo 'cb_' . $election['id'] . '_' . $position['id'] . '_' . $candidate['id']; ?>"><?php echo $name; ?></label>
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w30">
 						<?php else: ?>
 							<td class="w35">
@@ -64,7 +64,7 @@
 							<?php endif; ?>
 						<?php endif; ?>
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w5">
 								<?php echo img(array('src' => 'public/images/info.png', 'alt' => 'info', 'class' => 'pointer', 'title' => 'More info')); ?>
 							</td>
@@ -72,7 +72,7 @@
 					</tr>
 					<tr class="details">
 						<td colspan="4">
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<div style="display:none;" class="details">
 							<?php if ( ! empty($candidate['picture'])): ?>
 								<div style="float:left;padding-right:5px;">
@@ -120,7 +120,7 @@
 						<td class="w60">
 							<label for="<?php echo 'cb_' . $election['id'] . '_' . $position['id'] . '_abstain'; ?>">ABSTAIN</label>
 						</td>
-						<?php if ($settings['show_candidate_details']): ?>
+						<?php if ($this->config->item('halalan_show_candidate_details')): ?>
 							<td class="w30"></td>
 							<td class="w5"></td>
 						<?php else: ?>

@@ -7,7 +7,7 @@
 </head>
 <body>
 	<h2><?php echo $election['election']; ?></h2>
-	<p>Voted as <?php echo $voter['username']; ?></p>
+	<p>Voted as <?php echo $this->session->userdata('username'); ?></p>
 	<h3>Votes</h3>
 	<table cellspacing="2" cellpadding="2" border="0" style="width: 75%">
 		<?php foreach ($election['positions'] as $key => $position): ?>

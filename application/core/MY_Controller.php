@@ -33,6 +33,14 @@ class MY_Controller extends CI_controller {
 				redirect('gate/admin');
 			}
 		}
+		else if ($this->uri->segment(1) == 'voter') // voter side
+		{
+			if ($this->session->userdata('type') != 'voter')
+			{
+				$this->session->set_flashdata('messages', array('negative', e('common_unauthorized')));
+				redirect('gate/voter');
+			}
+		}
 	}
 
 	public function set_module($module)
