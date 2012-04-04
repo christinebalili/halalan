@@ -143,7 +143,7 @@ class Voters extends MY_Controller {
 			{
 				if ($case == 'add' || $this->input->post('pin'))
 				{
-					$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
+					$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_pin_length'));
 					$voter['pin'] = sha1($pin);
 				}
 			}
