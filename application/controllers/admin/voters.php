@@ -162,16 +162,16 @@ class Voters extends MY_Controller {
 			{
 				if ( ! empty($password))
 				{
-					$messages[] = 'Password: '. $password;
+					$messages[] = 'Password: ' . $password;
 				}
 				if ( ! empty($pin))
 				{
-					$messages[] = 'PIN: '. $pin;
+					$messages[] = 'PIN: ' . $pin;
 				}
 			}
 			else if ($this->config->item('halalan_password_pin_generation') == 'email')
 			{
-				$messages[] = 'Username: '. $voter['username'];
+				$messages[] = 'Username: ' . $voter['username'];
 				if ( ! empty($password) OR ! empty($pin))
 				{
 					$this->_send_email($voter, $password, $pin);
