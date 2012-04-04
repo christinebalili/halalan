@@ -1,5 +1,5 @@
 <?php echo display_messages('', $this->session->flashdata('messages')); ?>
-<?php echo form_open('gate/voter_login', 'class="hashPassword"'); ?>
+<?php echo form_open('gate/voter', 'class="hashPassword"'); ?>
 <div class="content_center">
 	<h2><?php echo 'HALALAN ' . e('gate_voter_login_label'); ?></h2>
 	<table cellpadding="0" cellspacing="0" border="0" class="form_table">
@@ -9,7 +9,7 @@
 		</tr>
 		<tr>
 			<td align="right"><?php echo form_label(e('gate_voter_password'), 'password'); ?>:</td>
-			<td><?php echo form_password('password', '', 'id="password" maxlength="' . $settings['password_length'] . '" class="text"'); ?></td>
+			<td><?php echo form_password('password', '', 'id="password" maxlength="' . $this->config->item('halalan_password_length') . '" class="text"'); ?></td>
 		</tr>
 		<tr>
 			<td colspan="2" align="center"><?php echo form_submit('submit', e('gate_voter_login_button')); ?></td>

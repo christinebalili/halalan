@@ -45,50 +45,50 @@ class Gate extends CI_Controller {
 	public function voter()
 	{
 		$this->_no_cache();
-		$data['settings'] = $this->config->item('halalan');
-		$gate['login'] = 'voter';
-		$gate['title'] = e('gate_voter_title');
-		$gate['body'] = $this->load->view('gate/voter', $data, TRUE);
-		$this->load->view('gate', $gate);
-	}
-
-	public function voter_login()
-	{
-		if ( ! $this->input->post('username') || ! $this->input->post('password'))
+		if ($this->input->post('submit'))
 		{
-			$messages = array('negative', e('gate_common_login_failure'));
-			$this->session->set_flashdata('messages', $messages);
-			redirect('gate/voter');
-		}
-		$username = $this->input->post('username');
-		$password = $this->input->post('password');
-		if (strlen($password) != 40)
-		{
-			$password = sha1($password);
-		}
-		if ($voter = $this->Boter->authenticate($username, $password))
-		{
-			if (strtotime($voter['login']) > strtotime($voter['logout']))
+			$username = $this->input->post('username');
+			$password = $this->input->post('password');
+			if ( ! $username OR ! $password)
 			{
-				$messages = array('negative', e('gate_voter_currently_logged_in'));
+				$messages = array('negative', e('gate_common_login_failure'));
 				$this->session->set_flashdata('messages', $messages);
 				redirect('gate/voter');
 			}
+			if (strlen($password) != 40)
+			{
+				$password = sha1($password);
+			}
+			if ($voter = $this->Boter->authenticate($username, $password))
+			{
+				if (strtotime($voter['login']) > strtotime($voter['logout']))
+				{
+					$messages = array('negative', e('gate_voter_currently_logged_in'));
+					$this->session->set_flashdata('messages', $messages);
+					redirect('gate/voter');
+				}
+				else
+				{
+					$this->Boter->update(array('login' => date("Y-m-d H:i:s"), 'ip_address' => ip2long($this->input->ip_address())), $voter['id']);
+					$this->session->set_userdata('id', $voter['id']);
+					$this->session->set_userdata('type', 'voter');
+					$this->session->set_userdata('username', $voter['username']);
+					$this->session->set_userdata('first_name', $voter['first_name']);
+					$this->session->set_userdata('last_name', $voter['last_name']);
+					redirect('voter/vote');
+				}
+			}
 			else
 			{
-				$this->Boter->update(array('login' => date("Y-m-d H:i:s"), 'ip_address' => ip2long($this->input->ip_address())), $voter['id']);
-				// don't save password to session
-				unset($voter['password']);
-				$this->session->set_userdata('voter', $voter);
-				redirect('voter/vote');
+				$messages = array('negative', e('gate_common_login_failure'));
+				$this->session->set_flashdata('messages', $messages);
+				redirect('gate/voter');
 			}
 		}
-		else
-		{
-			$messages = array('negative', e('gate_common_login_failure'));
-			$this->session->set_flashdata('messages', $messages);
-			redirect('gate/voter');
-		}
+		$gate['login'] = 'voter';
+		$gate['title'] = e('gate_voter_title');
+		$gate['body'] = $this->load->view('gate/voter', '', TRUE);
+		$this->load->view('gate', $gate);
 	}
 	
 	public function admin()
