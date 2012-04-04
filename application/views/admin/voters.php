@@ -58,5 +58,6 @@
 	<ul>
 		<li><?php echo anchor('admin/voters/import', 'Import Voters'); ?></li>
 		<li><?php echo anchor('admin/voters/export', 'Export Voters'); ?></li>
+		<li><?php echo anchor('admin/voters/generate', $this->config->item('halalan_pin') ? 'Generate Passwords and PINs' : 'Generate Passwords'); ?></li>
 	</ul>
 </div>

@@ -193,6 +193,13 @@ $config = array(
 				'label' => e('admin_export_block'),
 				'rules' => 'required'
 			)
+		),
+		'generate' => array(
+			array(
+				'field' => 'block_id',
+				'label' => e('admin_generate_block'),
+				'rules' => 'required'
+			)
 		)
 	);
 

@@ -56,6 +56,7 @@ class MY_Controller extends CI_controller {
 		$data['admin'] = $admin;
 		$message = $this->load->view('admin/_email', $data, TRUE);
 
+		$this->email->clear();
 		$this->email->from($email, $admin);
 		$this->email->to($voter['username']);
 		$this->email->subject('Halalan Login Credentials');

@@ -315,6 +315,66 @@ class Voters extends MY_Controller {
 		$this->load->view('admin', $admin);
 	}
 
+	public function generate()
+	{
+		// validation rules are in the config file
+		if ($this->form_validation->run('generate'))
+		{
+			$block_id = $this->input->post('block_id', TRUE);
+			$voters = $this->Boter->select_all_by_block_id($block_id);
+			if ($this->config->item('halalan_password_pin_generation') == 'web')
+			{
+				$header = '#,Last Name,First Name,Username,Password';
+				if ($this->config->item('halalan_pin'))
+				{
+					$header .= ',PIN';
+				}
+				$data[] = $header;
+				$count = 1;
+				foreach ($voters as $voter)
+				{
+					$boter = array();
+					$row = $count . ',' . $voter['last_name'] . ',' . $voter['first_name'] . ',' . $voter['username'];
+					$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
+					$row .= ',' . $password;
+					$boter['password'] = sha1($password);
+					if ($this->config->item('halalan_pin'))
+					{
+						$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_pin_length'));
+						$row .= ',' . $pin;
+						$boter['pin'] = sha1($pin);
+					}
+					$this->Boter->update($boter, $voter['id']);
+					$data[] = $row;
+					$count = $count + 1;
+				}
+				$data = implode("\r\n", $data);
+				force_download('block-' . $block_id . '.csv', $data);
+			}
+			else if ($this->config->item('halalan_password_pin_generation') == 'email')
+			{
+				foreach ($voters as $voter)
+				{
+					$password = '';
+					$pin = '';
+					$password = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_password_length'));
+					$boter['password'] = sha1($password);
+					if ($this->config->item('halalan_pin'))
+					{
+						$pin = random_string($this->config->item('halalan_password_pin_characters'), $this->config->item('halalan_pin_length'));
+						$boter['pin'] = sha1($pin);
+					}
+					$this->Boter->update($boter, $voter['id']);
+					$this->_send_email($voter, $password, $pin);
+				}
+			}
+		}
+		$data['blocks'] = $this->Block->for_dropdown();
+		$admin['title'] = $this->config->item('halalan_pin') ? e('admin_generate_password_pin_title') : e('admin_generate_password_title');
+		$admin['body'] = $this->load->view('admin/generate', $data, TRUE);
+		$this->load->view('admin', $admin);
+	}
+
 }
 
 /* End of file voters.php */

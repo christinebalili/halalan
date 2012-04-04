@@ -21,5 +21,7 @@ Password: <?php echo $password . "\n"; ?>
 PIN: <?php echo $pin . "\n"; ?>
 <?php endif; ?>
 
+<?php echo base_url(); ?>
+
 <?php echo $admin . "\n"; ?>
 Halalan Administrator
