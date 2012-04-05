@@ -96,8 +96,6 @@ class Voters extends MY_Controller {
 
 	public function _voter($case, $id = null)
 	{
-		$chosen_elections = array();
-		$chosen_positions = array();
 		if ($case == 'add')
 		{
 			$data['voter'] = array('username' => '', 'first_name' => '', 'last_name' => '', 'block_id' => '');
