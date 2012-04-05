@@ -133,6 +133,11 @@ $config = array(
 		),
 		'_voter_web' => array(
 			array(
+				'field' => 'block_id',
+				'label' => e('admin_voter_block'),
+				'rules' => 'required|callback__rule_running_election'
+			),
+			array(
 				'field' => 'username',
 				'label' => e('admin_voter_username'),
 				'rules' => 'required|max_length[63]|callback__rule_is_existing[voters.username]|callback__rule_dependencies'
@@ -146,14 +151,14 @@ $config = array(
 				'field' => 'last_name',
 				'label' => e('admin_voter_last_name'),
 				'rules' => 'required|max_length[63]'
-			),
+			)
+		),
+		'_voter_email' => array(
 			array(
 				'field' => 'block_id',
 				'label' => e('admin_voter_block'),
 				'rules' => 'required|callback__rule_running_election'
-			)
-		),
-		'_voter_email' => array(
+			),
 			array(
 				'field' => 'username',
 				'label' => e('admin_voter_email'),
@@ -168,11 +173,6 @@ $config = array(
 				'field' => 'last_name',
 				'label' => e('admin_voter_last_name'),
 				'rules' => 'required|max_length[63]'
-			),
-			array(
-				'field' => 'block_id',
-				'label' => e('admin_voter_block'),
-				'rules' => 'required|callback__rule_running_election'
 			)
 		),
 		'import' => array(

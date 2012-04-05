@@ -8,6 +8,14 @@
 <table cellpadding="0" cellspacing="0" border="0" class="form_table" width="100%">
 	<tr>
 		<td class="w20" align="right">
+			<?php echo form_label(e('admin_voter_block') . ':' , 'block_id'); ?>
+		</td>
+		<td>
+			<?php echo form_dropdown('block_id', array('' => 'Select Block') + $blocks, set_value('block_id', $voter['block_id']), 'id="block_id"'); ?>
+		</td>
+	</tr>
+	<tr>
+		<td class="w20" align="right">
 			<?php echo form_label($this->config->item('halalan_password_pin_generation') == 'email' ? e('admin_voter_email') : e('admin_voter_username') . ':', 'username'); ?>
 		</td>
 		<td>
@@ -28,24 +36,6 @@
 		</td>
 		<td>
 			<?php echo form_input('last_name', set_value('last_name', $voter['last_name']), 'id="last_name" maxlength="63" class="text"'); ?>
-		</td>
-	</tr>
-	<tr>
-		<td class="w20" align="right">
-			<?php echo form_label(e('admin_voter_block') . ':' , 'block_id'); ?>
-		</td>
-		<td>
-			<!-- form_dropdown and set_select don't work together :( -->
-			<select name="block_id" id="block_id">
-				<option value="">Select Block</option>
-				<?php foreach ($blocks as $block): ?>
-				<?php
-					echo '<option value="' . $block['id'] . '"';
-					echo set_select('block_id', $block['id'], $voter['block_id'] == $block['id'] ? TRUE : FALSE);
-					echo '>' . $block['block'] . '</option>';
-				?>
-				<?php endforeach; ?>
-			</select>
 		</td>
 	</tr>
 	<?php if ($action == 'edit'): ?>

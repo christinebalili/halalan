@@ -189,7 +189,7 @@ class Voters extends MY_Controller {
 				redirect('admin/voters/edit/' . $id);
 			}
 		}
-		$data['blocks'] = $this->Block->select_all();
+		$data['blocks'] = $this->Block->for_dropdown();
 		$data['action'] = $case;
 		$admin['title'] = e('admin_' . $case . '_voter_title');
 		$admin['body'] = $this->load->view('admin/voter', $data, TRUE);
