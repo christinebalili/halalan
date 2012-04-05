@@ -540,7 +540,7 @@ class Voter extends MY_Controller {
 			imagerectangle($im, 0, 0, $img_width-1, $img_height-1, $border_color);
 			$path = $this->config->item('halalan_image_trail_path') . $election_id . '/';
 			mkdir($path);
-			$name = $election_id . '_' . $this->voter['id'] . '.png';
+			$name = $election_id . '_' . $this->session->userdata('id') . '.png';
 			imagepng($im, $path . $name);
 			imagedestroy($im);
 			$config['source_image'] = $path . $name;
