@@ -40,7 +40,7 @@ function copySelectedWithAjax() {
 		$.ajax({
 			type: "POST",
 			url: window.location.href,
-			data: "election_ids=[" + array + "]",
+			data: "election_ids=[" + array + "]&halalan_csrf_token_name=" + $('input[name="halalan_csrf_token_name"]').val(),
 			success: function(msg){
 				var msg = $.parseJSON(msg);
 				var general = msg[0];
@@ -148,7 +148,7 @@ function fillPositionsAndParties() {
 	$.ajax({
 		type: "POST",
 		url: window.location.href,
-		data: $(this).serialize(),
+		data: $(this).serialize() + '&halalan_csrf_token_name=' + $('input[name="halalan_csrf_token_name"]').val(),
 		success: function(msg){
 			var msg = $.parseJSON(msg);
 			var positions = msg[0];
@@ -160,7 +160,7 @@ function fillPositionsAndParties() {
 			$('#position_id').append(option);
 			for (i = 0; i < positions.length; i++) {
 				option = new Option();
-				option.value = positions[i].position_id;
+				option.value = positions[i].id;
 				option.text = positions[i].position;
 				$('#position_id').append(option);
 			}
@@ -171,7 +171,7 @@ function fillPositionsAndParties() {
 			$('#party_id').append(option);
 			for (i = 0; i < parties.length; i++) {
 				option = new Option();
-				option.value = parties[i].party_id;
+				option.value = parties[i].id;
 				option.text = parties[i].party;
 				$('#party_id').append(option);
 			}
@@ -180,26 +180,19 @@ function fillPositionsAndParties() {
 }
 
 function changeElections() {
-	var url = SITE_URL;
-	if (url.length - 1 != url.lastIndexOf('/')) {
-		url += '/';
-	}
-	url += 'admin/';
-	// get string after SITE_URL + admin and before the next /
-	// example expected values: candidates, positions, etc
-	url += window.location.href.substring(url.length).split('/')[0];
-	url += '/index/' + $(this).val();
 	$.cookie('selected_election', $(this).val(), {path: '/'});
-	window.location.href = url;
+	$.cookie('selected_position', '', {path: '/'});
+	window.location.href = CURRENT_URL;
 }
 
 function changePositions() {
-	var url = SITE_URL;
-	if (url.length - 1 != url.lastIndexOf('/')) {
-		url += '/';
-	}
-	url += 'admin/candidates/index/' + $('select.changeElections').val() + '/' + $(this).val();
-	window.location.href = url;
+	$.cookie('selected_position', $(this).val(), {path: '/'});
+	window.location.href = CURRENT_URL;
+}
+
+function changeBlocks() {
+	$.cookie('selected_block', $(this).val(), {path: '/'});
+	window.location.href = CURRENT_URL;
 }
 
 /* DOM is ready */
@@ -222,9 +215,11 @@ $(document).ready(function () {
 	$('form.selectChosen').submit(selectChosen);
 	$('select.changeElections').change(changeElections);
 	$('select.changePositions').change(changePositions);
-	/* used in add/edit candidates */
+	$('select.changeBlocks').change(changeBlocks);
 	$('select.fillPositionsAndParties').change(fillPositionsAndParties);
+	
 	/* Code that aren't bound to events */
 	highlightMenuItem(menu_map);
 	animateFlashMessage();
+	$('input[type="text"]:eq(0)').focus();
 });
