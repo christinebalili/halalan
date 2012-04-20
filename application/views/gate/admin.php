@@ -8,7 +8,7 @@
 			<td><?php echo form_input('username', '', 'id="username" maxlength="63" class="text"'); ?></td>
 		</tr>
 		<tr>
-			<td align="right"><?php echo form_label(e('gate_admin_password'), 'password'); ?>:</label></td>
+			<td align="right"><?php echo form_label(e('gate_admin_password'), 'password'); ?>:</td>
 			<td><?php echo form_password('password', '', 'id="password" class="text"'); ?></td>
 		</tr>
 		<tr>
