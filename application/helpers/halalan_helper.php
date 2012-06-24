@@ -55,7 +55,7 @@ function display_messages($validation, $custom)
 	// but we are sure that only one of the params has values
 	if ( ! empty($validation))
 	{
-		$return .= '<div class="negative"><ul>';
+		$return .= '<div class="alert alert-error"><ul>';
 		$return .= $validation;
 		$return .= '</ul></div>';
 	}
@@ -63,11 +63,11 @@ function display_messages($validation, $custom)
 	{
 		if ($custom[0] == 'positive')
 		{
-			$return .= '<div class="positive"><ul>';
+			$return .= '<div class="alert alert-success"><ul>';
 		}
 		else
 		{
-			$return .= '<div class="negative"><ul>';
+			$return .= '<div class="alert alert-error"><ul>';
 		}
 		unset($custom[0]);
 		$return .= '<li>' . implode('</li><li>', $custom) . '</li>';
