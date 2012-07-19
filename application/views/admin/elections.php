@@ -23,9 +23,8 @@
 						<td colspan="5" class="center"><em><?php echo e('admin_elections_no_elections'); ?></em></td>
 					</tr>
 					<?php else: ?>
-					<?php $i = 0; ?>
 					<?php foreach ($elections as $election): ?>
-					<tr class="<?php echo ($i % 2 == 0) ? 'odd' : 'even'  ?>">
+					<tr>
 						<td class="center">
 							<?php echo $election['id']; ?>
 						</td>
@@ -60,7 +59,6 @@
 							<?php echo anchor('admin/elections/delete/' . $election['id'], '<i class="icon-trash icon-white"></i> Delete election', 'title="Delete election" class="action btn btn-small btn-danger confirmDelete"'); ?>
 						</td>
 					</tr>
-					<?php $i = $i + 1; ?>
 					<?php endforeach; ?>
 					<?php endif; ?>
 				</tbody>
