@@ -1,3 +1,7 @@
+body {
+	padding-top: 60px;
+}
+
 .pill-pane {
 	background: #eee;
 }
@@ -38,7 +42,7 @@ fieldset fieldset {
 	margin-bottom: 0;
 }
 .tab-content {
-	border: 1px solid #999;
+	border: 1px solid #ddd;
 	border-top: 0;
 	padding: 1.0em;
 }
