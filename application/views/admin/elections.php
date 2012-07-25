@@ -7,6 +7,7 @@
 	<div class="tab-content">
 		<div class="tab-pane active">
 			<h2>Showing list of elections</h2>
+			<?php echo display_messages($this->session->flashdata('messages')); ?>
 			<table class="table table-bordered table-striped table-highlight">
 				<thead>
 					<tr class="center">

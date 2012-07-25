@@ -12,6 +12,7 @@
 					<i>Filter positions by <?php echo form_dropdown('election_id', array('' => 'Choose Election') + $elections, $election_id, 'class="changeElections"'); ?></i>
 				</fieldset>
 			</form>
+			<?php echo display_messages($this->session->flashdata('messages')); ?>
 			<table class="table table-bordered table-striped table-highlight">
 				<thead>
 					<tr class="center">
