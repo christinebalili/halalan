@@ -14,7 +14,12 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script src="<?php echo base_url('public/js/jquery.min.js'); ?>"></script>
+    <script src="<?php echo base_url('public/js/jquery.cookie.js'); ?>"></script>
     <script src="<?php echo base_url('public/js/bootstrap.min.js'); ?>"></script>
+    <script type="text/javascript">
+        var BASE_URL = '<?php echo base_url(); ?>';
+        var SITE_URL = '<?php echo site_url(); ?>';
+    </script>
     <script src="<?php echo base_url('public/js/admin.js'); ?>"></script>
   </head>
   <body>
