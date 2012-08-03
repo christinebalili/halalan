@@ -19,6 +19,7 @@
     <script type="text/javascript">
         var BASE_URL = '<?php echo base_url(); ?>';
         var SITE_URL = '<?php echo site_url(); ?>';
+        var CURRENT_URL = '<?php echo current_url(); ?>';
     </script>
     <script src="<?php echo base_url('public/js/admin.js'); ?>"></script>
   </head>
