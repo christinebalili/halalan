@@ -48,7 +48,9 @@
               <li<?php echo $blocks; ?>><?php echo anchor('admin/blocks', 'Blocks', 'title="Manage Blocks"'); ?></li>
               <li<?php echo $voters; ?>><?php echo anchor('admin/voters', 'Voters', 'title="Manage Voters"'); ?></li>
             </ul>
-            <?php echo anchor('gate/logout', 'Logout (' . $this->session->userdata('username') . ')', 'id="user-info" class="pull-right"'); ?>
+            <ul class="nav pull-right">
+              <li><?php echo anchor('gate/logout', 'Logout (' . $this->session->userdata('username') . ')'); ?></li>
+            </ul>
           </div><!--/.nav-collapse -->
         </div>
       </div>
