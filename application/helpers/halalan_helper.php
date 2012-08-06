@@ -41,38 +41,29 @@ function e($line)
 }
 
 /**
- * Return formatted validation errors or custom messages
+ * Return formatted custom messages
  *
  * @access	public
- * @param	string
  * @param	array
  * @return	string
  */
-function display_messages($validation, $custom)
+function display_messages($custom)
 {
+	if (empty($custom))
+	{
+		return '';
+	}
 	$return = '';
-	// negatives take precedent
-	// but we are sure that only one of the params has values
-	if ( ! empty($validation))
+	if ($custom[0] == 'positive')
 	{
-		$return .= '<div class="negative"><ul>';
-		$return .= $validation;
-		$return .= '</ul></div>';
+		$return .= '<div class="alert alert-success">';
 	}
-	else if ( ! empty($custom))
+	else
 	{
-		if ($custom[0] == 'positive')
-		{
-			$return .= '<div class="positive"><ul>';
-		}
-		else
-		{
-			$return .= '<div class="negative"><ul>';
-		}
-		unset($custom[0]);
-		$return .= '<li>' . implode('</li><li>', $custom) . '</li>';
-		$return .= '</ul></div>';
+		$return .= '<div class="alert alert-error">';
 	}
+	unset($custom[0]);
+	$return .= implode('<br />', $custom) . '</div>';
 	return $return;
 }
 

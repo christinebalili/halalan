@@ -42,24 +42,29 @@ class Candidates extends MY_Controller {
 		{
 			$position_id = $this->input->cookie('selected_position');
 		}
-		$positions = $this->Position->select_all_by_election_id($election_id);
-		foreach ($positions as $key => $value)
+		$candidates = array();
+		if ($position_id == 0)
 		{
-			$positions[$key]['candidates'] = $this->Candidate->select_all_by_election_id_and_position_id($election_id, $value['id']);
-			if ($position_id > 0 && $value['id'] == $position_id)
+			$positions = $this->Position->select_all_by_election_id($election_id);
+			foreach ($positions as $key => $value)
 			{
-				$tmp = $positions[$key];
-				// clear data since only one position will be displayed
-				$positions = array();
-				$positions[] = $tmp; 
-				break;
+				$tmp = $this->Candidate->select_all_by_election_id_and_position_id($election_id, $value['id']);
+				if (empty($tmp))
+				{
+					continue;
+				}
+				$candidates = array_merge($candidates, $tmp);
 			}
+		}
+		else
+		{
+			$candidates = $this->Candidate->select_all_by_election_id_and_position_id($election_id, $position_id);
 		}
 		$data['election_id'] = $election_id;
 		$data['elections'] = $this->Election->for_dropdown();
 		$data['position_id'] = $position_id;
-		$data['pos'] = $this->Position->for_dropdown($election_id);
-		$data['positions'] = $positions;
+		$data['positions'] = $this->Position->for_dropdown($election_id);
+		$data['candidates'] = $candidates;
 		$admin['title'] = e('admin_candidates_title');
 		$admin['body'] = $this->load->view('admin/candidates', $data, TRUE);
 		$this->load->view('admin', $admin);

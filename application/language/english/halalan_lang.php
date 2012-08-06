@@ -33,7 +33,7 @@ $lang['halalan_gate_statistics_title'] = 'Statistics';
 $lang['halalan_gate_ballots_title'] = 'Ballots';
 
 // views/gate/voter.php
-$lang['halalan_gate_voter_login_label'] = 'LOGIN';
+$lang['halalan_gate_voter_login_label'] = 'Voter';
 $lang['halalan_gate_voter_username'] = 'Username';
 $lang['halalan_gate_voter_password'] = 'Password';
 $lang['halalan_gate_voter_login_button'] = 'Login';
@@ -41,7 +41,7 @@ $lang['halalan_gate_voter_not_running'] = 'The election is not running. Please w
 $lang['halalan_gate_voter_result'] = 'The ' . anchor('gate/results', 'results') . ' are now available!';
 
 // views/gate/admin.php
-$lang['halalan_gate_admin_login_label'] = 'ADMIN LOGIN';
+$lang['halalan_gate_admin_login_label'] = 'Admin';
 $lang['halalan_gate_admin_username'] = 'Username';
 $lang['halalan_gate_admin_password'] = 'Password';
 $lang['halalan_gate_admin_login_button'] = 'Login';
