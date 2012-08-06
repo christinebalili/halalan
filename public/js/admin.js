@@ -14,6 +14,11 @@ function changePositions() {
 	window.location.href = CURRENT_URL;
 }
 
+function changeBlocks() {
+	$.cookie('selected_block', $(this).val(), {path: '/'});
+	window.location.href = CURRENT_URL;
+}
+
 function fillPositionsAndParties() {
 	$.ajax({
 		type: "POST",
@@ -117,6 +122,7 @@ $(document).ready(function () {
 	$('a.confirmDelete').click(confirmDelete);
 	$('select.changeElections').change(changeElections);
 	$('select.changePositions').change(changePositions);
+	$('select.changeBlocks').change(changeBlocks);
 	$('select.fillPositionsAndParties').change(fillPositionsAndParties);
 	$('form.selectChosen').submit(selectChosen);
 	$('input:button.copySelectedWithAjax').click(copySelectedWithAjax);
