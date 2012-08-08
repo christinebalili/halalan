@@ -1,27 +1,23 @@
-<?php echo display_messages('', $this->session->flashdata('messages')); ?>
-<?php echo form_open('gate/voter', 'class="hashPassword"'); ?>
-<div class="content_center">
-	<h2><?php echo 'HALALAN ' . e('gate_voter_login_label'); ?></h2>
-	<table cellpadding="0" cellspacing="0" border="0" class="form_table">
-		<tr>
-			<td align="right"><?php echo form_label(e('gate_voter_username'), 'username'); ?>:</td>
-			<td><?php echo form_input('username', '', 'id="username" maxlength="63" class="text"'); ?></td>
-		</tr>
-		<tr>
-			<td align="right"><?php echo form_label(e('gate_voter_password'), 'password'); ?>:</td>
-			<td><?php echo form_password('password', '', 'id="password" maxlength="' . $this->config->item('halalan_password_length') . '" class="text"'); ?></td>
-		</tr>
-		<tr>
-			<td colspan="2" align="center"><?php echo form_submit('submit', e('gate_voter_login_button')); ?></td>
-		</tr>
-		<tr>
-			<td colspan="2" align="center">
-				view:
-				<?php echo anchor('gate/results', 'results'); ?> |
-				<?php echo anchor('gate/statistics', 'statistics'); ?> |
-				<?php echo anchor('gate/ballots', 'ballots'); ?>
-			</td>
-		</tr>
-	</table>
-</div>
-</form>
+<div id="container">
+	<?php echo form_open('gate/voter'); ?>
+		<h1 class="center">
+			<img src="<?php echo base_url('public/img/logo.png'); ?>" alt="Halalan Logo" />
+		</h1>
+		<?php echo display_messages($this->session->flashdata('messages')); ?>
+		<label for="username">
+			<?php echo e('gate_voter_username'); ?>
+			<?php echo form_input('username', '', 'id="username" maxlength="63"'); ?>
+		</label>
+		<label for="password">
+			<?php echo e('gate_voter_password'); ?>
+			<?php echo form_password('password', '', 'id="password" maxlength="' . $this->config->item('halalan_password_length') . '"'); ?>
+		</label>
+		<?php echo form_submit('submit', e('gate_voter_login_button'), 'class="btn btn-primary"'); ?>
+	<?php echo form_close(); ?>
+	<p class="center options">
+		view:
+		<?php echo anchor('gate/results', 'results'); ?> |
+		<?php echo anchor('gate/statistics', 'statistics'); ?> |
+		<?php echo anchor('gate/ballots', 'ballots'); ?>
+	</p>
+</div>	
