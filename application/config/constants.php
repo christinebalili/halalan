@@ -44,6 +44,8 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 | Text here. :D
 |
 */
+define('HALALAN_PASSWORD_MINIMUM_LENGTH', 6);
+define('HALALAN_PASSWORD_MAXIMUM_LENGTH', 8);
 define('HALALAN_UPLOAD_PATH', './public/uploads/');
 define('HALALAN_ALLOWED_TYPES', 'gif|jpg|png');
 define('HALALAN_LOGO_SIZE', 250);
