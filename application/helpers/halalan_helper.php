@@ -96,6 +96,34 @@ function form_input_html($name, $value, $extra, $help, $lang_key, $error = TRUE)
 }
 
 /**
+ * Return form_password with custom HTML
+ *
+ * @access	public
+ * @param	string
+ * @return	string
+ */
+function form_password_html($name, $value, $extra, $help, $lang_key, $error = TRUE)
+{
+	$CI =& get_instance();
+	$CI->load->helper('form');
+	$label = e($lang_key);
+	if (empty($label))
+	{
+		$CI->load->helper('inflector');
+		$label = humanize($name);
+	}
+	$label = form_label($label . ':', $name, array('class' => 'control-label'));
+	$element = form_password($name, set_value($name, $value), 'id="' . $name . '" ' . $extra);
+	$class = '';
+	if ($error)
+	{
+		$help = form_error($name) ? form_error($name, ' ', ' ') : $help;
+		$class = form_error($name) ? ' error' : '';
+	}
+	return _form_element_html_template($label, $element, $help, $class);
+}
+
+/**
  * Return submit button with custom HTML
  *
  * @access	public

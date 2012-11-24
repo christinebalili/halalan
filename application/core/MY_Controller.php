@@ -29,7 +29,16 @@ class MY_Controller extends CI_controller {
 	public function __construct()
 	{
 		parent::__construct();
-		if ($this->uri->segment(1) == 'admin') // admin side
+		$this->load->helper('url');
+		if (file_exists(APPPATH . 'controllers/install.php'))
+		{
+			redirect('install');
+		}
+		$this->load->library('session');
+		$this->load->helper(array('form', 'halalan'));
+		$this->load->language('halalan');
+		$this->load->model('Abmin');
+		/*if ($this->uri->segment(1) == 'admin') // admin side
 		{
 			if ($this->session->userdata('type') != 'admin')
 			{
@@ -44,7 +53,7 @@ class MY_Controller extends CI_controller {
 				$this->session->set_flashdata('messages', array('negative', e('common_unauthorized')));
 				redirect('gate/voter');
 			}
-		}
+		}*/
 	}
 
 	public function set_module($module)

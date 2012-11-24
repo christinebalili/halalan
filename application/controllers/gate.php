@@ -22,12 +22,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-class Gate extends CI_Controller {
+class Gate extends MY_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		if ( ! in_array($this->uri->segment(2), array('results', 'statistics', 'ballots', 'logout')))
+		if (in_array($this->uri->segment(2), array('admin', 'voter')))
 		{
 			if ($this->session->userdata('type') == 'admin')
 			{
@@ -43,13 +43,16 @@ class Gate extends CI_Controller {
 
 	public function index()
 	{
-		redirect('gate/voter');
+		$gate['active'] = 'home';
+		$gate['title'] = 'Home';
+		$gate['body'] = $this->load->view('gate/index', '', TRUE);
+		$this->load->view('gate', $gate);
 	}
 
 	public function voter()
 	{
 		$this->_no_cache();
-		if ($this->input->post('submit'))
+		if ( ! empty($_POST))
 		{
 			$username = $this->input->post('username');
 			$password = $this->input->post('password');
@@ -59,11 +62,7 @@ class Gate extends CI_Controller {
 				$this->session->set_flashdata('messages', $messages);
 				redirect('gate/voter');
 			}
-			if (strlen($password) != 40)
-			{
-				$password = sha1($password);
-			}
-			if ($voter = $this->Boter->authenticate($username, $password))
+			if ($voter = $this->Boter->authenticate($username, sha1($password)))
 			{
 				if (strtotime($voter['login']) > strtotime($voter['logout']))
 				{
@@ -90,7 +89,7 @@ class Gate extends CI_Controller {
 				redirect('gate/voter');
 			}
 		}
-		$gate['login'] = 'voter';
+		$gate['active'] = 'voter';
 		$gate['title'] = e('gate_voter_title');
 		$gate['body'] = $this->load->view('gate/voter', '', TRUE);
 		$this->load->view('gate', $gate);
@@ -98,7 +97,7 @@ class Gate extends CI_Controller {
 	
 	public function admin()
 	{
-		if ($this->input->post('submit'))
+		if ( ! empty($_POST))
 		{
 			$username = $this->input->post('username');
 			$password = $this->input->post('password');
@@ -108,11 +107,7 @@ class Gate extends CI_Controller {
 				$this->session->set_flashdata('messages', $messages);
 				redirect('gate/admin');
 			}
-			if (strlen($password) != 40)
-			{
-				$password = sha1($password);
-			}
-			if ($admin = $this->Abmin->authenticate($username, $password))
+			if ($admin = $this->Abmin->authenticate($username, sha1($password)))
 			{
 				$this->session->set_userdata('id', $admin['id']);
 				$this->session->set_userdata('type', 'admin');
@@ -129,7 +124,7 @@ class Gate extends CI_Controller {
 				redirect('gate/admin');
 			}
 		}
-		$gate['login'] = 'admin';
+		$gate['active'] = 'admin';
 		$gate['title'] = e('gate_admin_title');
 		$gate['body'] = $this->load->view('gate/admin', '', TRUE);
 		$this->load->view('gate', $gate);
